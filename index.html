@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+
+<!--
+index.html for Erdorbit
+author: thibaut voirand
+-->
+
+<html>
+
+	<head>
+
+		<title> Erdorbit - Drawing orbits in an ECEF frame </title>
+
+		<link rel='stylesheet' type='text/css' href='stylesheet.css'/>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	</head>
+
+	<body>
+
+		<div id="header">
+
+			<h1> Erdorbit </h1>
+
+		</div>
+
+		<div id="simulation_div">
+
+			<div id="graph_div">
+
+				<canvas id="canvas" width="600" height="600">
+				This text is displayed if your browser does not support
+				HTML5 Canvas.
+				</canvas>
+
+				<form id="graph_buttons_form">
+
+					<input type="button" class="button" id="bt_up">
+					<input type="button" class="button" id="bt_down">
+					<input type="button" class="button" id="bt_left">
+					<input type="button" class="button" id="bt_right">
+
+					<input type="button" class="button" id="bt_center">
+					<input type="button" class="button" id="bt_clockwise">
+					<input type="button" class="button" id="bt_counterclockwise">
+
+					<input type="button" class="button" id="bt_zoom_in">
+					<input type="button" class="button" id="bt_zoom_out">
+
+					<input type="button" class="button" id="bt_animation">
+					<input type="button" class="button" id="bt_animation_stop">
+
+					<input type="checkbox" id="checkbox_translate">
+					<label for="checkbox_translate" id="text_translate"> <p class="p_small">Translate</p> </label>
+
+					<input type="button" class="button" id="bt_adapt_size" value="Adapt size">
+
+				</form>
+
+			</div>
+
+			<div id="parameters_div">
+
+
+				<form id="orbit_param_form">
+
+					<h3>Orbital Parameters</h3>
+					<div class="tooltip">
+						<p>Semi-major axis (km)</p>
+						<span class="tooltiptext">
+							Affects the size of the orbit
+						</span>
+					</div>
+					<br>
+					<input type="text" name="input_a" value="7000" id="input_a" size="10"> <br>
+					<br>
+
+					<div class="tooltip">
+						<p>Eccentricity (-)</p>
+						<span class="tooltiptext">
+							Affects the form of the orbit
+						</span>
+					</div>
+					<br>
+					<input type="text" name="input_e" value="0.6" id="input_e" size="10"> <br>
+					<br>
+					<div class="tooltip">
+						<p>Inclination (deg) </p>
+						<span class="tooltiptext">
+							Affects the orientation of the orbit
+						</span>
+					</div>
+					<br>
+					<input type="text" name="input_i" value="30" id="input_i" size="10"> <br>
+					<br>
+					<div class="tooltip">
+						<p>Argument of periapsis (deg) </p>
+						<span class="tooltiptext">
+							Affects the orientation of the orbit
+						</span>
+					</div>
+					<br>
+					<input type="text" name="input_om" value="10" id="input_om" size="10"> <br>
+
+				</form>
+
+
+				<form id="simul_param_form">
+
+					<h3>Simulation Parameters</h3>
+
+					<p>Duration (days)</p>
+					<input type="text" name="input_dur" value="10" id="input_dur" size="10"> <br>
+					<br>
+
+					<p>
+						<input type="radio" name="radio_step" id="radio_step_nb" value="radio_step_nb" checked>
+						<label for="radio_step_nb"> Number of steps (-) </label>
+					</p>
+					<input type="text" name="step_nb" value="30000" id="step_nb" size="10">
+					<br>
+
+					<br>
+					<p>
+						<input type="radio" name="radio_step" id="radio_step_time" value="radio_step_time">
+						<label for="radio_step_time" id="label_step_time"> Step-time (s)</label>
+					</p>
+					<input type="text" name="step_time" value="100" id="step_time" size="10">
+					<br>
+
+				</form>
+
+
+				<form id="param_buttons_form">
+
+					<div id="param_buttons_div">
+
+						<input type="button" class="button" id="bt_draw" value="Draw">
+						<input type="button" class="button" id="bt_clear" value="Clear">
+
+					</div>
+
+					<div id="dl_div">
+
+						<p style="font-weight:bold">Download as image:</p>
+						<br>
+						<select id="dl_res">
+							<option value="600">600x600px</option>
+							<option value="640">640x480px</option>
+							<option value="1024">1024x768px</option>
+							<option value="1152">1152x864px</option>
+							<option value="1600">1600x1200px</option>
+						</select>
+						<br>
+						<br>
+						<input type="button" class="button" id="bt_dl" value="Download">
+
+					</div>
+
+					<div id="upload_div">
+
+						<p style="font-weight:bold">Upload to gallery:</p>
+						<br>
+						<p>Username (optional)</p>
+						<input type="text" name="username" id="username"><br>
+						<br>
+						<p>Email adress (optional)</p>
+						<input type="text" name="useremail" id="useremail"><br>
+						<br>
+						<input type="button" class="button" id="bt_upload" value="Upload">
+
+					</div>
+
+				</form>
+
+
+
+
+			</div>
+
+		</div>
+
+		<div id="explanation_div">
+
+			<br><h3>Explanation</h3><br>
+
+			<p>
+			This page allows you to plot the trajectory of an object flying on a
+			specific orbit around the earth, as seen in an Earth-centered,
+			Earth-fixed frame (ECEF).
+			<br>
+			<br>
+
+			<table style="width:100%">
+			<col width="225">
+
+			<tr>
+				<th align=left>
+				The orbital parameters
+				</th>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Semi-major axis
+				</td>
+				<td>
+				Half the distance between the lowest and the highest
+				points of the orbit.
+				<br>
+				Affects the size of the orbit, and the speed at which the object
+				is travelling around the earth.
+				</td>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Eccentricity
+				</td>
+				<td>
+				Measures the "oblateness" of the orbit. By 0, the
+				orbit is circular. By 1 and above, the orbit is a parabolic escape
+				trajectory. This page only computes	eccentricities between 0
+				(inclusive) and 1 (exclusive).
+				</td>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Inclination
+				</td>
+				<td>
+				Angle between the orbit plane and the equator.
+				<br>
+				Affects the orientation of the orbit.
+				</td>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Argument of periapsis
+				</td>
+				<td>
+				Angle defining the orientation of the
+				lowest point of the orbit.
+				<br>
+				Affects the orientation of the orbit.
+				</td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+
+			<tr>
+				<th align=left>
+				The simulation parameters
+				</th>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Duration
+				</td>
+				<td>
+				Lapse of time within which the positions of the
+				object are computed and drawn.
+				<br>
+				A low value will display a short curve. A high value will display
+				a long and intricate curve.
+				</td>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Number of steps
+				</td>
+				<td>
+				Number of positions which will be computed and
+				drawn.
+				<br>
+				A low value will display a light and imprecise curve. A
+				high value will display a darker and more precise curve, but will
+				need more time to compute.
+				</td>
+			</tr>
+
+			<tr>
+				<td valign=top>
+				Step-time
+				</td>
+				<td>
+				Time elapsed between each position computed.
+				<br>
+				A high value will display a light and imprecise curve.
+				A low value will display a darker and more precise curve, but
+				will need more time	to compute.
+				<br>
+				An alternative to the number of steps.
+				</td>
+			</tr>
+
+			</table>
+
+			</p>
+
+		</div>
+
+		<div id="gallery_div">
+
+			<br><h3>Gallery</h3><br>
+
+		</div>
+
+		<div id="footer">
+
+			<p>
+				v1.0.3 <br>
+				Copyright Thibaut Voirand <br>
+				thibautvoirand@gmail.com <br>
+			</p>
+
+		</div>
+
+		<script type="text/javascript" src="script.js"></script>
+
+	</body>
+
+</html>
