@@ -34,11 +34,16 @@ p{
 
 .p_small{
 	font-size: 0.83em;
+	display:inline-block;
 }
 
 form {
 	border: 1px solid black;
 }
+
+input[type=text]{
+	display:inline-block;
+}	
 
 th{
 	padding: 5px;
