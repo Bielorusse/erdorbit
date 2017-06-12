@@ -1,4 +1,4 @@
-Erdorbit V1.0.3
+Erdorbit <br>
 author: thibaut voirand
 
 Plotting orbits in an ECEF frame (Earth centered, Earth fixed).
