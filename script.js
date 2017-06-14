@@ -43,7 +43,7 @@ which plots the positions on a HTML5 canvas.
 Mathematical functions:
 	- orb2car		converts orbital parameters to cartesian coordinates
 	- rot_frame		converts coordinates to rotating, Earth-fixed frame
-	- getmax		returns greatest value from a 2D array
+	- getextr		returns extremum of a 2D array
 	- list_prod		multiply each value from an array by a scalar
 	- proj			projects spatial coordinates on a plane: 3D to 2D
 
@@ -126,17 +126,11 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet){
 	}
 
 	// computing true anomaly
-	var nu = (2 * Math.atan2( Math.sqrt( (1+e)/(1-e) ) *
-		Math.tan(E/2) , 1 ) ) % 360 ;
+	var nu = (2 * Math.atan2(Math.sqrt(1+Number(e)) * Math.sin(E/2),
+    		Math.sqrt(1-e) * Math.cos(E/2))) % (Math.PI * 2) ;
 
 	// computing radius
-	var r = a * (1 - e * Math.cos(E) );
-
-	// computing focal parameter
-	var p = a * (1 - Math.pow(e,2));
-
-	// computing specific angular momentum
-	var h = Math.sqrt( mu_planet * p ) ;
+	var r = a * (1 - Math.pow(e,2)) / (1 + e * Math.cos(nu));
 
 	// computing pos vector
 	var pos = [r * (Math.cos(om+nu) * Math.cos(RAAN) -
@@ -180,7 +174,7 @@ function rot_frame(pos,t,rot_planet){
 }
 
 // getting max value of a 2D array
-function getmax(array){
+function getextr(array){
 	/*
 	Getting max value of a 2D array
 
@@ -199,8 +193,8 @@ function getmax(array){
 
 	for (j=0 ; j<array.length ; j++){
 		for (k=0 ; k<array[j].length ; k++){
-			if (max < array[j][k]){
-				max = array[j][k] ;
+			if (max < Math.abs(array[j][k]) ){
+				max = Math.abs(array[j][k]) ;
 			}
 		}
 	}
@@ -269,12 +263,11 @@ function proj(vec, alpha, beta, delta){
 
 }
 
-
 // declaring  calculation variables
 var pos = [[]] ; // positions vectors array
 var pos_2d = [[]] ; // projected positions vectors array
-var mu_planet ; // planet gravitational parameter
-var rot_planet ; // planet rotation velocity
+var mu_planet = 399000 ; // planet gravitational parameter (km3/s2)
+var rot_planet = 0.00417 ; // planet rotation velocity (deg/s)
 var dur ; // simulation duration
 var dt ; // simulation step-time
 var step_nb ; // simulation number of step
@@ -322,14 +315,6 @@ document.getElementById("bt_draw").onclick = function (){
 
 	// Setting up the problem
 
-
-	// planet parameters
-
-	// pl. gravitational parameter (km3/s2)
-	mu_planet = 399000 ;
-	// pl. rotational velocity (deg/s)
-	rot_planet = 0.00417 ;
-
 	// simulation parameters
 
 	// simulation duration (s)
@@ -366,7 +351,7 @@ document.getElementById("bt_draw").onclick = function (){
 	}
 
 	// getting size of the drawing
-	size = getmax(pos)*2;
+	size = getextr(pos)*2;
 
 	// resizing positions to fit the graph
 	pos = list_prod(pos, cheight/size*9/10) ;
@@ -762,7 +747,7 @@ document.getElementById("bt_zoom_out").onclick = function() {
 document.getElementById("bt_adapt_size").onclick = function() {
 
 	// resizing positions to fit the graph
-	pos = list_prod(pos, cheight/2/getmax(pos)*9/10) ;
+	pos = list_prod(pos, cheight/2/getextr(pos)*9/10) ;
 
 	// clearing the canvas
 	ctx.clearRect(0, 0, cheight, cheight) ;
