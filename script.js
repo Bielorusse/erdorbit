@@ -966,7 +966,7 @@ $.ajax({ // retrieving database info from server with ajax request
 
 				var single_line = [];
 				for (var j=0; j<headers.length; j++) {
-					single_line.push(data_cell[j].slice(1,-1)); // get rid of double quotes
+					single_line.push(data_cell[j]);
 				}
 				csv.push(single_line);
 			}
