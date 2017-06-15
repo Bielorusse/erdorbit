@@ -104,10 +104,10 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet){
 
 	*/
 
-    // converting angles to radians
-    i = i * Math.PI/180 ;
-    RAAN = RAAN * Math.PI/180 ;
-    om = om * Math.PI/180 ;
+  // converting angles to radians
+  i = i * Math.PI/180 ;
+  RAAN = RAAN * Math.PI/180 ;
+  om = om * Math.PI/180 ;
 
 	// computing mean anomaly
 	var n = Math.sqrt(mu_planet/ Math.pow(a,3)) ;
@@ -125,9 +125,9 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet){
 		}
 	}
 
-	// computing true anomaly
-	var nu = (2 * Math.atan2(Math.sqrt(1+Number(e)) * Math.sin(E/2),
-    		Math.sqrt(1-e) * Math.cos(E/2))) % (Math.PI * 2) ;
+  // computing true anomaly
+  var nu = (2 * Math.atan2(Math.sqrt(1+Number(e)) * Math.sin(E/2),
+    Math.sqrt(1-e) * Math.cos(E/2))) % (Math.PI * 2) ;
 
 	// computing radius
 	var r = a * (1 - Math.pow(e,2)) / (1 + e * Math.cos(nu));
@@ -173,10 +173,10 @@ function rot_frame(pos,t,rot_planet){
 
 }
 
-// getting max value of a 2D array
+// getting max value of an array
 function getextr(array){
 	/*
-	Getting max value of a 2D array
+	Getting extremum of a 2D array
 
 	Inputs:
 		array 	= 2D array
@@ -214,18 +214,21 @@ function list_prod(list,scal){
 		scal	= input scalar
 
 	Outputs:
-		list 	= output vector
+		list_output 	= output vector
 
 	*/
+
+  var list_output = new Array(list.length);
 
 	var j ; // creating count variable
 	var k ; // creating count variable
 	for (j=0 ; j<list.length ; j++){
+    list_output[j] = new Array(list[j].length);
 		for (k=0 ; k<list[j].length ; k++){
-			list[j][k] = list[j][k] * scal ;
+			list_output[j][k] = list[j][k] * scal ;
 		}
 	}
-	return list ;
+	return list_output ;
 }
 
 // projecting a 3D vector on a plane
@@ -248,7 +251,7 @@ function proj(vec, alpha, beta, delta){
 	*/
 
 
-	vec = [Math.cos(beta) * vec[0] -
+  vec = [Math.cos(beta) * vec[0] -
 					Math.sin(beta) * vec[1],
 					- Math.sin(beta) * Math.sin(alpha) * vec[0]
 					- Math.cos(beta) * Math.sin(alpha) * vec[1]
@@ -257,11 +260,10 @@ function proj(vec, alpha, beta, delta){
 	vec = [Math.cos(delta) * vec[0] + Math.sin(delta) * vec[1],
 			Math.cos(delta) * vec[1] - Math.sin(delta) * vec[0]];
 
-
-
 	return vec ;
 
 }
+
 
 // declaring  calculation variables
 var pos = [[]] ; // positions vectors array
@@ -350,7 +352,7 @@ document.getElementById("bt_draw").onclick = function (){
 		pos[j] = rot_frame(pos[j],j*dt,rot_planet);
 	}
 
-	// getting size of the drawing
+  // getting size of the drawing
 	size = getextr(pos)*2;
 
 	// resizing positions to fit the graph
@@ -833,47 +835,41 @@ document.getElementById("bt_dl").onclick = function() {
 		canvas_tobedl.width = 600;
 		canvas_tobedl.height = 600;
 
-	} else if (document.getElementById("dl_res").value == 640){
+	} else if (document.getElementById("dl_res").value == 1000){
 
-		// creating a 640x480px canvas
+		// creating a 1000x1000px canvas
 		var canvas_tobedl = document.createElement("canvas");
-		canvas_tobedl.width = 640;
-		canvas_tobedl.height = 480;
+		canvas_tobedl.width = 1000;
+		canvas_tobedl.height = 1000;
 
-	} else if (document.getElementById("dl_res").value == 1024){
+	} else if (document.getElementById("dl_res").value == 2000){
 
-		// creating a 1024x748px canvas
+		// creating a 2000x2000px canvas
 		var canvas_tobedl = document.createElement("canvas");
-		canvas_tobedl.width = 1024;
-		canvas_tobedl.height = 768;
+		canvas_tobedl.width = 2000;
+		canvas_tobedl.height = 2000;
 
-	} else if (document.getElementById("dl_res").value == 1152){
+	} else if (document.getElementById("dl_res").value == 10000){
 
-		// creating a 1152x864px canvas
+		// creating a 10000x10000px canvas
 		var canvas_tobedl = document.createElement("canvas");
-		canvas_tobedl.width = 1152;
-		canvas_tobedl.height = 864;
-
-	} else if (document.getElementById("dl_res").value == 1600){
-
-		// creating a 1600x1200px canvas
-		var canvas_tobedl = document.createElement("canvas");
-		canvas_tobedl.width = 1600;
-		canvas_tobedl.height = 1200;
+		canvas_tobedl.width = 10000;
+		canvas_tobedl.height = 10000;
 
 	}
 
-	canvas_tobedl_ctx = canvas_tobedl.getContext("2d");
-	canvas_tobedl_ctx.lineWidth = 0.3 ;
+  //creating canvas context
+  canvas_tobedl_ctx = canvas_tobedl.getContext("2d");
+  canvas_tobedl_ctx.lineWidth = 0.3 * canvas_tobedl.height/cheight ; // setting line width
 
 	// adjusting image size to new canvas resolution
-	pos = list_prod(pos, canvas_tobedl.height/cheight) ;
+	pos_dl = list_prod(pos, canvas_tobedl.height/cheight) ;
 
 	// Projecting points on 2D plane
 	var j ; // creating count variable
 	var pos_2d = [[]] ; // creating array of 2D positions
-	for(j=0 ; j<pos.length ; j++){
-		pos_2d[j] = (proj(pos[j], alpha, beta, delta)) ;
+	for(j=0 ; j<pos_dl.length ; j++){
+		pos_2d[j] = (proj(pos_dl[j], alpha, beta, delta)) ;
 	}
 
 	// converting positions to fit the HTML canvas frame
@@ -895,8 +891,12 @@ document.getElementById("bt_dl").onclick = function() {
 	// creating a (fictional) link to download the file
 	var download_link = document.createElement("a");
 	download_link.download = "Erdorbit.png"; // file name
-	download_link.href = canvas_tobedl.toDataURL(); // URL of canvas data
-	download_link.click(); // trigger click of the link
+
+  //storing canvas data in a blob object for downloading
+  canvas_tobedl.toBlob(function(blob){
+    download_link.href = URL.createObjectURL(blob); //creating data URL
+    download_link.click(); //
+  },'image/png');
 
 }
 
@@ -944,7 +944,7 @@ document.getElementById("bt_upload").onclick = function() {
 	  }
 	}).done(function() {
 	  alert('upload complete'); // displaying success to the user
-	  console.log('saved'); // displaying success in the console
+	  console.log('upload complete'); // displaying success in the console
 	});
 
 }
