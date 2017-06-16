@@ -3,389 +3,386 @@ stylesheet.css for Erdorbit
 author: thibaut voirand
 */
 
-
-
 /* General properties */
 
-*{
-	font-family: Helvetica;
+* {
+  font-family: Helvetica;
 }
 
-body{
-	font-size: 100%;
+body {
+  font-size: 100%;
 }
 
 div {
-	display: inline-block;
+  display: inline-block;
 }
 
-h1{
-	font-size: 2em;
+h1 {
+  font-size: 2em;
 }
 
-h3{
-	font-size: 1.17em;
+h3 {
+  font-size: 1.17em;
 }
 
-p{
-	margin: 0px;
-	font-size: 1em;
+p {
+  margin: 0px;
+  font-size: 1em;
 }
 
-.p_small{
-	font-size: 0.83em;
-	display:inline-block;
+.p_small {
+  font-size: 0.83em;
+  display: inline-block;
 }
 
 form {
-	border: 1px solid black;
+  border: 1px solid black;
 }
 
-input[type=text]{
-	display:inline-block;
-}	
-
-th{
-	padding: 5px;
-	font-size: 1em;
-	font-weight: bold;
+input[type=text] {
+  display: inline-block;
 }
 
-td{
-	padding: 5px;
-	font-size: 1em;
+th {
+  padding: 5px;
+  font-size: 1em;
+  font-weight: bold;
 }
 
-.button{
-	padding: 1px;
-	margin: 1px;
-	font-size: 0.83em;
+td {
+  padding: 5px;
+  font-size: 1em;
 }
 
-.img{
-	margin-right: auto;
-	margin-left: auto;
+.button {
+  padding: 1px;
+  margin: 1px;
+  font-size: 0.83em;
 }
 
-.tooltip{
-	border: none;
-	margin: 0px;
-	padding: 0px;
-	display: inline-block;
-	position: relative;
-	font-size: 1em;
+.img {
+  margin-right: auto;
+  margin-left: auto;
 }
 
-.tooltip .tooltiptext{
-    visibility: hidden;
-	border: 0.5px solid black;
-	border-radius: 5px;
-    background-color: #FFFFE2;
-	text-align: left;
-	font-size: 0.83em;
-    padding: 5px 5px 5px 5px;
-	width: 120px;
-	position: absolute;
-	left: 105%;
-	top: -100%;
-	z-index: 999;
-
+.tooltip {
+  border: none;
+  margin: 0px;
+  padding: 0px;
+  display: inline-block;
+  position: relative;
+  font-size: 1em;
 }
 
-.tooltip:hover .tooltiptext{
-	visibility: visible ;
+.tooltip .tooltiptext {
+  visibility: hidden;
+  border: 0.5px solid black;
+  border-radius: 5px;
+  background-color: #FFFFE2;
+  text-align: left;
+  font-size: 0.83em;
+  padding: 5px 5px 5px 5px;
+  width: 120px;
+  position: absolute;
+  left: 105%;
+  top: -100%;
+  z-index: 999;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 /* Header properties */
 
-#header{
-	display: block;
-	border-bottom: 1px solid black;
-	margin: 0px 0px 20px 0px;
-	padding: 100px 100px 100px 100px;
+#header {
+  display: block;
+  border-bottom: 1px solid black;
+  margin: 0px 0px 20px 0px;
+  padding: 100px 100px 100px 100px;
 }
 
 /* Simulation div properties */
 
-#simulation_div{
-	padding: 100px 0px 100px 0px;
+#simulation_div {
+  padding: 100px 0px 100px 0px;
 }
 
 #graph_div {
-	width: 600px;
-	height: 621px;
-	float: right;
-	position: relative;
+  width: 600px;
+  height: 621px;
+  float: right;
+  position: relative;
 }
 
 #canvas {
-	border: 1px solid black;
-	height: 500px;
-	width: 500px;
-	padding: 10px;
-	position: absolute;
-	top: 10px;
-	left: 39px;
+  border: 1px solid black;
+  height: 500px;
+  width: 500px;
+  padding: 10px;
+  position: absolute;
+  top: 10px;
+  left: 39px;
 }
 
 #graph_buttons_form {
-	height: 60px;
-	width: 145px;
-	padding: 5px;
-	position: absolute;
-	left: 221.5px;
-	bottom: 10px;
+  height: 60px;
+  width: 145px;
+  padding: 5px;
+  position: absolute;
+  left: 221.5px;
+  bottom: 10px;
 }
 
 /* Graph buttons properties */
 
 #bt_up {
-	background: url(images/arrow-up.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 5px;
-	left: 25px;
+  background: url(images/arrow-up.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  left: 25px;
 }
 
 #bt_down {
-	background: url(images/arrow-down.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 45px;
-	left: 25px;
+  background: url(images/arrow-down.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 45px;
+  left: 25px;
 }
 
 #bt_left {
-	background: url(images/arrow-left.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 25px;
-	left: 5px;
+  background: url(images/arrow-left.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 25px;
+  left: 5px;
 }
 
 #bt_right {
-	background: url(images/arrow-right.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 25px;
-	left: 45px;
+  background: url(images/arrow-right.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 25px;
+  left: 45px;
 }
 
 #bt_counterclockwise {
-	background: url(images/counterclockwise.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 5px;
-	left: 45px;
+  background: url(images/counterclockwise.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  left: 45px;
 }
 
 #bt_clockwise {
-	background: url(images/clockwise.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 5px;
-	left: 5px;
+  background: url(images/clockwise.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  left: 5px;
 }
 
 #bt_center {
-	background: url(images/center.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 25px;
-	left: 25px;
+  background: url(images/center.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 25px;
+  left: 25px;
 }
 
 #bt_zoom_in {
-	background: url(images/zoom-in.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 45px;
-	left: 5px;
+  background: url(images/zoom-in.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 45px;
+  left: 5px;
 }
 
 #bt_zoom_out {
-	background: url(images/zoom-out.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 45px;
-	left: 45px;
+  background: url(images/zoom-out.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 45px;
+  left: 45px;
 }
 
-#checkbox_translate{
-	height: 14px;
-	width: 14px;
-	margin: 1px;
-	padding: 1px;
-	position: absolute;
-	top: 28px;
-	left: 70px;
+#checkbox_translate {
+  height: 14px;
+  width: 14px;
+  margin: 1px;
+  padding: 1px;
+  position: absolute;
+  top: 28px;
+  left: 70px;
 }
 
-#text_translate{
-	height: 20px;
-	width: 60px;
-	padding: 3px 0px 0px 0px;
-	margin: 0px;
-	position: absolute;
-	top: 25px;
-	left: 90px;
+#text_translate {
+  height: 20px;
+  width: 60px;
+  padding: 3px 0px 0px 0px;
+  margin: 0px;
+  position: absolute;
+  top: 25px;
+  left: 90px;
 }
 
-#bt_animation{
-	background: url(images/play.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 5px;
-	left: 70px;
+#bt_animation {
+  background: url(images/play.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  left: 70px;
 }
 
-#bt_animation_stop{
-	background: url(images/stop.png);
-	background-position: center;
-	height: 20px;
-	width: 20px;
-	position: absolute;
-	top: 5px;
-	left: 90px;
+#bt_animation_stop {
+  background: url(images/stop.png);
+  background-position: center;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  top: 5px;
+  left: 90px;
 }
 
-#bt_adapt_size{
-	height: 20px;
-	width: 80px;
-	position: absolute;
-	top: 45px;
-	left: 70px;
+#bt_adapt_size {
+  height: 20px;
+  width: 80px;
+  position: absolute;
+  top: 45px;
+  left: 70px;
 }
 
 /* Parameters div properties */
 
 #parameters_div {
-	width: 600px;
-	height: 621px;
-	float: left;
-	position: relative;
+  width: 600px;
+  height: 621px;
+  float: left;
+  position: relative;
 }
 
 #orbit_param_form {
-	height: 300px;
-	width: 258px;
-	padding: 10px;
-	margin: 10px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
+  height: 300px;
+  width: 258px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 #simul_param_form {
-	height: 300px;
-	width: 258px;
-	padding: 10px;
-	margin: 10px;
-	position: absolute;
-	top: 0px;
-	right: 0px;
+  height: 300px;
+  width: 258px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 
 #param_buttons_form {
-	height: 241px;
-	width: 558px;
-	padding: 10px;
-	margin:10px;
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
+  height: 241px;
+  width: 558px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
 }
 
-#param_buttons_div{
-	height: 216px;
-	width: 166px;
-	padding: 10px;
-	margin: 10px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
+#param_buttons_div {
+  height: 216px;
+  width: 166px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
-#bt_draw{
-	height: 50px;
-	width: 60px;
-	position: absolute;
-	top: 63.3px;
-	left: 62px;
+#bt_draw {
+  height: 50px;
+  width: 60px;
+  position: absolute;
+  top: 63.3px;
+  left: 62px;
 }
 
-#bt_clear{
-	height: 50px;
-	width: 60px;
-	position: absolute;
-	bottom: 63.3px;
-	left: 62px;
+#bt_clear {
+  height: 50px;
+  width: 60px;
+  position: absolute;
+  bottom: 63.3px;
+  left: 62px;
 }
 
-#dl_div{
-	height: 216px;
-	width: 166px;
-	padding: 10px;
-	margin: 10px;
-	position: absolute;
-	top: 0px;
-	left: 186px;
+#dl_div {
+  height: 216px;
+  width: 166px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  top: 0px;
+  left: 186px;
 }
 
-#upload_div{
-	height: 216px;
-	width: 166px;
-	padding: 10px;
-	margin: 10px;
-	position: absolute;
-	top: 0px;
-	right: 0px;
+#upload_div {
+  height: 216px;
+  width: 166px;
+  padding: 10px;
+  margin: 10px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 
 /* Explanation div properties */
 
 #explanation_div {
-	border-top: 1px solid black;
-	clear: both ;
-	padding: 100px 200px 100px 200px;
+  border-top: 1px solid black;
+  clear: both;
+  padding: 100px 200px 100px 200px;
 }
 
 /* Gallery div properties */
 
 #gallery_div {
-	display: block;
-	border-top: 1px solid black;
-	clear: both;
-	padding: 100px 100px 100px 100px;
-	text-align: center;
+  display: block;
+  border-top: 1px solid black;
+  clear: both;
+  padding: 100px 100px 100px 100px;
+  text-align: center;
 }
 
 /* Footer div properties */
 
 #footer {
-	display: block;
-	clear: both;
-	border-top: 1px solid black;
-	padding: 100px 100px 100px 100px;
-	text-align: center;
+  display: block;
+  clear: both;
+  border-top: 1px solid black;
+  padding: 100px 100px 100px 100px;
+  text-align: center;
 }
