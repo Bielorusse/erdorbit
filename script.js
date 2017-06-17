@@ -353,7 +353,7 @@ document.getElementById('bt_draw').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions reference frame to fit the HTML canvas
+  // translating object and converting positions reference frame to fit the HTML canvas
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -432,7 +432,7 @@ document.getElementById('bt_center').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -466,7 +466,7 @@ document.getElementById('bt_up').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -500,7 +500,7 @@ document.getElementById('bt_down').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -534,7 +534,7 @@ document.getElementById('bt_left').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -568,7 +568,7 @@ document.getElementById('bt_right').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -598,11 +598,11 @@ document.getElementById('bt_clockwise').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2;
+    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
+    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
   }
 
   // Drawing line
@@ -628,11 +628,11 @@ document.getElementById('bt_counterclockwise').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2;
+    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
+    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
   }
 
   // Drawing line
@@ -659,7 +659,7 @@ document.getElementById('bt_zoom_in').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -690,7 +690,7 @@ document.getElementById('bt_zoom_out').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
     pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
@@ -721,11 +721,11 @@ document.getElementById('bt_adapt_size').onclick = function() {
     pos_2d[j] = proj(pos[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2;
+    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
+    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
   }
 
   // Drawing line
@@ -817,11 +817,17 @@ document.getElementById('bt_dl').onclick = function() {
     pos_2d[j] = proj(pos_dl[j], alpha, beta, delta);
   }
 
-  // converting positions to fit the HTML canvas frame
+  // translating object and converting positions to fit the HTML canvas frame
   var j; // creating count variable
   for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + canvas_tobedl.width / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + canvas_tobedl.height / 2 - dy;
+    pos_2d[j][0] =
+      pos_2d[j][0] +
+      canvas_tobedl.width / 2 +
+      dx * canvas_tobedl.height / cheight;
+    pos_2d[j][1] =
+      -pos_2d[j][1] +
+      canvas_tobedl.height / 2 -
+      dy * canvas_tobedl.height / cheight;
   }
 
   // Drawing line
