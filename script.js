@@ -118,7 +118,7 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet) {
   var nu =
     2 *
     Math.atan2(
-      Math.sqrt(1 + Number(e)) * Math.sin(E / 2),
+      Math.sqrt(1 + e) * Math.sin(E / 2),
       Math.sqrt(1 - e) * Math.cos(E / 2)
     ) %
     (Math.PI * 2);
@@ -310,28 +310,28 @@ document.getElementById('bt_draw').onclick = function() {
   // simulation parameters
 
   // simulation duration (s)
-  dur = document.getElementById('input_dur').value * 86400;
+  dur = parseFloat(document.getElementById('input_dur').value * 86400);
   // step time (s) and number of steps (-)
   if (document.getElementById('radio_step_time').checked) {
-    dt = document.getElementById('step_time').value;
+    dt = parseFloat(document.getElementById('step_time').value);
     step_nb = dur / dt;
   } else {
-    step_nb = document.getElementById('step_nb').value;
+    step_nb = parseInt(document.getElementById('step_nb').value, 10);
     dt = dur / step_nb;
   }
 
   // orbital parameters
 
   // semi-major axis (km)
-  a = document.getElementById('input_a').value;
+  a = parseFloat(document.getElementById('input_a').value);
   // eccentricity (-)
-  e = document.getElementById('input_e').value;
+  e = parseFloat(document.getElementById('input_e').value);
   // inclination (deg)
-  i = document.getElementById('input_i').value;
+  i = parseFloat(document.getElementById('input_i').value);
   // right ascension of the ascending node (deg)
   RAAN = 0;
   // argument of periapsis (deg)
-  om = document.getElementById('input_om').value;
+  om = parseFloat(document.getElementById('input_om').value);
 
   // getting positions for each simulation step
 
