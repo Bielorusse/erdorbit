@@ -3,94 +3,57 @@ script.js for Erdorbit
 author: thibaut voirand
 */
 
-/*Description of the script*****************************************
-
+/*Description of the script*************************************************************************
 The purpose of this script is to compute the positions of a
 spacecraft on a given orbit in cartesian coordinates, and to draw
 them.
+***************************************************************************************************/
 
-The first part of the script contains:
-	- mathematical functions for the calculations
-	- declaration of variables
-	- function which plots the positions on a HTML5 canvas
+/*Declaration of variables**************************************************************************
+***************************************************************************************************/
 
-The second part of the script contains functions that allow the user
-to manipulate the drawing, such as:
-	- zoom in and out
-	- rotate the projection plane (and thus, the image of the trajectory)
-	- clear, recenter the canvas
-	- play an animation of the trajectory
+// declaring  calculation variables
+var pos = [[]]; // positions vectors array
+var pos2D = [[]]; // projected positions vectors array
+var MU_PLANET = 398600.4418; // planet gravitational parameter (km3/s2)
+var ROT_PLANET = 360 / 86164.1004; // planet rotation velocity (deg/s)
+var dur; // simulation duration
+var dt; // simulation step-time
+var numberOfSteps; // simulation number of steps
+var a; // orbit semi-major axis
+var e; // orbit eccenctricity
+var i; // orbit inclination
+var RAAN = 0; // orbit right ascension of the ascending node
+var om; // orbit argument of periapsis
 
-The third part of the script contains functions that allow the user
-to store the drawing (download to computer or upload to gallery), as well
-as a request to display all images from the gallery on the page
+// declaring drawing related variables
+var DRAWING_SIZE_FACTOR = 9 / 10;
+var canvas = document.getElementById('Canvas');
+var canvasContext = canvas.getContext('2d');
+canvasContext.lineWidth = 0.3;
+var timer; // timer variable for animation
+var alpha = 0 * Math.PI / 180; // plane angle around intersection of itself and OXY plane
+var beta = 0 * Math.PI / 180; // plane angle around OZ
+var delta = 0 * Math.PI / 180; // rotation of projected figure around normal to projection plane
+var xTranslation = 0; // translation along x-axis of object from center of drawing
+var yTranslation = 0; // translation along y-axis of object from center of drawing
 
-*******************************************************************/
+/*Math- geometry- and canvas-related functions******************************************************
+***************************************************************************************************/
 
-/*First part of the script******************************************
-
-The first part of the script contains mathematical functions for the
-calculations, declaration of variables, and the "draw" function
-which plots the positions on a HTML5 canvas.
-
-Mathematical functions:
-	- orb2car		converts orbital parameters to cartesian coordinates
-	- rot_frame		converts coordinates to rotating, Earth-fixed frame
-	- getextr		returns extremum of a 2D array
-	- list_prod		multiply each value from an array by a scalar
-	- proj			projects spatial coordinates on a plane: 3D to 2D
-
-Variables:
-	Calculation:
-	- pos			array containing positions' 3D coordinates
-	- pos_2d		array containing positions' 2D coordinates
-	- mu_planet		planet's gravitational parameter
-	- rot_planet	planet's rotation velocity
-	- dur			duration of simulation
-	- dt			simulation step-time
-	- step_nb		number of steps
-	- a				orbit's semi-major axis
-	- e				orbit's eccentricity
-	- i				orbit's inclination
-	- RAAN			orbit's right ascension of the ascending node
-	- om			orbit's argument of periapsis
-	Drawing:
-	- size			drawing size, scope of the canvas
-	- canvas		HTML5 canvas
-	- ctx			canvas' context
-	- cheight		canvas' height
-	- timer			timer for animation
-	- alpha			rotation angle of projection plane along
-					intersection of itself and OXY plane
-	- beta			rotation angle of projection plane along axis OZ
-	- delta			rotation of projected coordinates around
-					normal to projection plane
-	- dx			translation of the coordinates along X
-	- dy			translation of the coordinates along Y
-
-*******************************************************************/
-
-// Additional functions
-
-// converting from orbital parameters to cartesian coordinate
-function orb2car(a, e, i, RAAN, om, t, mu_planet) {
+function fromOrbitalToCartesianCoordinates(a, e, i, RAAN, om, t, MU_PLANET) {
   /*
-
 	Converting from orbital parameters to cartesian coordinates
-
-		Inputs:
+	- Inputs:
 			a       	semi-major axis (km)
 			e       	eccentricity (-)
 			i       	inclination (deg)
 			RAAN    	right ascension of the ascending node (deg)
 			om      	argument of periapsis (deg)
 			t       	time spent since passage at periapsis (s)
-			mu_planet	gravitational parameter of the planet
-						(km3/s2)
-
-		Outputs:
-			pos   	position vector of the satellite (km)
-
+			MU_PLANET	gravitational parameter of the planet	(km3/s2)
+	- Outputs:
+			pos   	  position vector of the orbiting object (km)
 	*/
 
   // converting angles to radians
@@ -99,7 +62,7 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet) {
   om = om * Math.PI / 180;
 
   // computing mean anomaly
-  var n = Math.sqrt(mu_planet / Math.pow(a, 3));
+  var n = Math.sqrt(MU_PLANET / Math.pow(a, 3));
   var M = n * t;
 
   // computing eccentric anomaly
@@ -141,281 +104,390 @@ function orb2car(a, e, i, RAAN, om, t, mu_planet) {
   return pos;
 }
 
-// converting from rotating reference frame to planet fixed  r. f.
-function rot_frame(pos, t, rot_planet) {
+function fromJ2000ToECEF(posJ2000, t, ROT_PLANET) {
   /*
-
-	Converting from rotating to planet fixed reference frame
-
-	Inputs:
-		pos			position vector in rotating frame (km)
-		t 		 	time (s)
-		rot_planet	planet rotational velocity (deg/s)
-
-	Outpus:
-		pos_rot	=	position vector in planet fixed ref. frame (km)
-
+	Converting coordinates from standard J2000 to Earth-centered Earth-fixed reference frame
+  - Inputs:
+      posJ2000    position vector in rotating frame (km)
+      t 		 	    time (s)
+      ROT_PLANET	planet rotational velocity (deg/s)
+  - Outpus:
+      posECEF	    position vector in planet fixed ref. frame (km)
 	*/
 
-  rot_planet = rot_planet * Math.PI / 180;
+  ROT_PLANET = ROT_PLANET * Math.PI / 180;
 
-  var pos_rot = [
-    Math.cos(rot_planet * t) * pos[0] + Math.sin(rot_planet * t) * pos[1],
-    -Math.sin(rot_planet * t) * pos[0] + Math.cos(rot_planet * t) * pos[1],
-    pos[2]
+  var posECEF = [
+    Math.cos(ROT_PLANET * t) * posJ2000[0] +
+      Math.sin(ROT_PLANET * t) * posJ2000[1],
+    -Math.sin(ROT_PLANET * t) * posJ2000[0] +
+      Math.cos(ROT_PLANET * t) * posJ2000[1],
+    posJ2000[2]
   ];
 
-  return pos_rot;
+  return posECEF;
 }
 
-// getting max value of an array
-function getextr(array) {
+function getExtremum(array) {
   /*
 	Getting extremum of a 2D array
-
-	Inputs:
-		array 	= 2D array
-
-	Outputs:
-		max 	= max value of 2D array
-
+	- Inputs:
+	   array     2D array
+	- Outputs:
+	   extremum  extremum value of 2D array
 	*/
 
   var j; // creating count variable
   var k; // creating count variable
 
-  var max = array[0][0];
+  var extremum = array[0][0];
 
   for (j = 0; j < array.length; j++) {
     for (k = 0; k < array[j].length; k++) {
-      if (max < Math.abs(array[j][k])) {
-        max = Math.abs(array[j][k]);
+      if (extremum < Math.abs(array[j][k])) {
+        extremum = Math.abs(array[j][k]);
       }
     }
   }
 
-  return max;
+  return extremum;
 }
 
-// mutiplying each cell of an array by a scalar
-function list_prod(list, scal) {
+function multiplyArrayByScalar(inputArray, scal) {
   /*
-
-	Multiplying each component of a list of lists by a scalar
-
-	Inputs:
-		list 	= input list of lists
-		scal	= input scalar
-
-	Outputs:
-		list_output 	= output vector
-
+	Multiplying each component of a 2D array by a scalar
+	- Inputs:
+      inputArray  input array
+      scal        input scalar
+	- Outputs:
+		  outputArray output array
 	*/
 
-  var list_output = new Array(list.length);
+  var outputArray = new Array(inputArray.length);
 
   var j; // creating count variable
   var k; // creating count variable
-  for (j = 0; j < list.length; j++) {
-    list_output[j] = new Array(list[j].length);
-    for (k = 0; k < list[j].length; k++) {
-      list_output[j][k] = list[j][k] * scal;
+  for (j = 0; j < inputArray.length; j++) {
+    outputArray[j] = new Array(inputArray[j].length);
+    for (k = 0; k < inputArray[j].length; k++) {
+      outputArray[j][k] = inputArray[j][k] * scal;
     }
   }
-  return list_output;
+  return outputArray;
 }
 
-// projecting a 3D vector on a plane
-function proj(vec, alpha, beta, delta) {
+function planarProjection(inputArray, alpha, beta) {
   /*
-	Projecting a 3D vector on a plane
-
-	Inputs:
-		vec 	= 3D vector
-		beta	= rotation of the projection plane around Oz
-		alpha    = rotation of the p.p. around intersection
-					of itself and Oxy plane
-		delta   = rotation of the projected vector around the normal
-				  to the projection plane
-
-	Outputs:
-		vec 	= 2D projection of the input vector on the plane
-
+	Projecting an array of 3D coordinates on a plane
+  - Inputs:
+	   inputArray 	 array of 3D coordinates
+		 beta	         rotation of the projection plane around Oz
+		 alpha         rotation of the p.p. around intersection of itself and Oxy plane
+		 delta         rotation of the projected vector around the normal to the projection plane
+	- Outputs:
+	   outputArray   2D projection of the input array on the plane
 	*/
 
-  vec = [
-    Math.cos(beta) * vec[0] - Math.sin(beta) * vec[1],
-    -Math.sin(beta) * Math.sin(alpha) * vec[0] -
-      Math.cos(beta) * Math.sin(alpha) * vec[1] +
-      Math.cos(alpha) * vec[2]
-  ];
+  var outputArray = new Array(inputArray.length);
 
-  vec = [
-    Math.cos(delta) * vec[0] + Math.sin(delta) * vec[1],
-    Math.cos(delta) * vec[1] - Math.sin(delta) * vec[0]
-  ];
+  var j;
+  for (j = 0; j < inputArray.length; j++) {
+    outputArray[j] = new Array(2);
+    outputArray[j][0] =
+      Math.cos(beta) * inputArray[j][0] - Math.sin(beta) * inputArray[j][1];
+    outputArray[j][1] =
+      -Math.sin(beta) * Math.sin(alpha) * inputArray[j][0] -
+      Math.cos(beta) * Math.sin(alpha) * inputArray[j][1] +
+      Math.cos(alpha) * inputArray[j][2];
+  }
 
-  return vec;
+  return outputArray;
 }
 
-// declaring  calculation variables
-var pos = [[]]; // positions vectors array
-var pos_2d = [[]]; // projected positions vectors array
-var mu_planet = 398600.4418; // planet gravitational parameter (km3/s2)
-var rot_planet = 360 / 86164.1004; // planet rotation velocity (deg/s)
-var dur; // simulation duration
-var dt; // simulation step-time
-var step_nb; // simulation number of step
-var a; // orbit semi-major axis
-var e; // orbit eccenctricity
-var i; // orbit inclination
-var RAAN; // orbit right ascension of the ascending node
-var om; // orbit argument of periapsis
-
-// Setting up the drawing
-var size; // drawing size
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
-ctx.lineWidth = 0.3;
-var cheight = canvas.height;
-var timer; // declaring timer variable for animation
-
-// declaring projection plane direction angles
-var alpha = 0 * Math.PI / 180; // plane angle around intersection of
-// itself and OXY plane
-var beta = 0 * Math.PI / 180; // plane angle around OZ
-var delta = 0 * Math.PI / 180; // rotation of the projected figure
-// around the normal to the projection plane
-
-// declaring translation of object from center of drawing
-var dx = 0;
-var dy = 0;
-
-// drawing orbit when clicking the "draw" button
-document.getElementById('bt_draw').onclick = function() {
+function computePositions(
+  a,
+  e,
+  i,
+  RAAN,
+  om,
+  MU_PLANET,
+  ROT_PLANET,
+  numberOfSteps,
+  dt
+) {
   /*
-	Drawing orbit
+  This function computes the positions of the orbiting object in a ECEF reference frame
+  - Inputs:
+    - orbital parameters:
+      a           semi-major axis
+      e           eccentricity
+      i           inclination
+      RAAN        right ascension of the ascending node
+      om          argument of periapsis
+    - planetary constants:
+      MU_PLANET   planet gravitational parameter
+      ROT_PLANET  planet rotational velocity
+    numberOfSteps number of steps
+    dt            step time
+  Ouputs:
+    positionsArray array of positions
+  */
 
-	In this function:
-		- the parameters (orbit, simulation, and planet) are entered
-		- the positions are computed and saved in the pos[[]] array
-		- the positions are adapted (size, 2D projection, reference frame)
-		and drawn on the canvas
+  var positionsArray = new Array(numberOfSteps);
 
+  // computing positions for each simulation step
+  var j; // creating count variable
+  for (j = 0; j < numberOfSteps; j++) {
+    positionsArray[j] = fromOrbitalToCartesianCoordinates(
+      a,
+      e,
+      i,
+      RAAN,
+      om,
+      j * dt,
+      MU_PLANET
+    );
+    positionsArray[j] = fromJ2000ToECEF(positionsArray[j], j * dt, ROT_PLANET);
+  }
 
-	*/
+  return positionsArray;
+}
 
-  // Setting up the problem
+function adaptCoordinatesToCanvasFrame(inputCoord, canvasWidth, canvasHeight) {
+  /*
+  The reference frame of the HTML5 canvas is centered in the upper left corner, with the X axis
+  pointing to the right, and the Y axis pointing down.
+  This function transforms 2D coordinates so that the drawing is centered at the center of the
+  canvas, with the Y axis pointing up.
+  - Input:
+    inputCoord   array of 2D coordinates expressed in a "classical" cartesian reference frame
+    canvasWidth  canvas width
+    canvasHeight canvas height
+  - Output:
+    outputCoord  array of 2D coordinates, adapted to the HTML5 canvas' reference frame
+  */
+
+  var outputCoord = new Array(inputCoord.length);
+
+  var j; // creating count variable
+  for (j = 0; j < inputCoord.length; j++) {
+    outputCoord[j] = new Array(2);
+    outputCoord[j][0] = inputCoord[j][0] + canvasWidth / 2;
+    outputCoord[j][1] = -inputCoord[j][1] + canvasHeight / 2;
+  }
+
+  return outputCoord;
+}
+
+function translateCoordinates(inputCoord, dx, dy) {
+  /*
+  This function translates the positions in a 2D reference frame
+  - Inputs:
+      inputCoord  input coordinates
+      dx          translation along x axis
+      dy          translation along y axis
+  - Output:
+      outputCoord output coordinates
+  */
+
+  var outputCoord = new Array(inputCoord.length);
+
+  var j;
+  for (j = 0; j < inputCoord.length; j++) {
+    outputCoord[j] = new Array(2);
+    outputCoord[j][0] = inputCoord[j][0] + dx;
+    outputCoord[j][1] = inputCoord[j][1] + dy;
+  }
+
+  return outputCoord;
+}
+
+function rotateCoordinates(inputCoord, delta) {
+  /*
+  This functions rotates 2D coordinates around the center of the reference frame from a delta angle
+  - Input:
+      inputCoord  input 2D coordinates
+      delta       rotation angle
+  - Output:
+      outputCoord output 2D coordinates
+  */
+
+  var outputCoord = new Array(inputCoord.length);
+
+  var j;
+  for (j = 0; j < inputCoord.length; j++) {
+    outputCoord[j] = new Array(2);
+    outputCoord[j][0] =
+      Math.cos(delta) * inputCoord[j][0] + Math.sin(delta) * inputCoord[j][1];
+    outputCoord[j][1] =
+      Math.cos(delta) * inputCoord[j][1] - Math.sin(delta) * inputCoord[j][0];
+  }
+
+  return outputCoord;
+}
+
+function resizeDrawingToFitCanvas(inputCoord, canvasHeight) {
+  /*
+  This function resizes the drawing to fit the canvas size
+  - Input:
+      inputCoord    input coordinates
+      canvasHeight  canvas height
+  - Output:
+      outputCoord   output coordinates
+  */
+
+  var drawingSize = getExtremum(inputCoord) * 2;
+
+  var outputCoord = multiplyArrayByScalar(
+    inputCoord,
+    canvasHeight / drawingSize * DRAWING_SIZE_FACTOR
+  );
+
+  return outputCoord;
+}
+
+function drawOrbit(
+  pos,
+  alpha,
+  beta,
+  delta,
+  xTranslation,
+  yTranslation,
+  canvasContext,
+  canvasWidth,
+  canvasHeight
+) {
+  /*
+  This function draws the trajectory of an orbiting object on the canvas
+  This function calls several previously defined functions
+  - Input:
+      pos   array of 3D cartesian positions the orbiting object
+      alpha         projection plane angle
+      beta          projection plane angle
+      delta         drawing rotation angle
+      xTranslation  drawing translation along x-axis
+      yTranslation  drawing translation along y-axis
+      canvasContext canvas context
+      canvasWidth   canvas width
+      canvasHeight  canvas height
+  */
+
+  canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  pos2D = planarProjection(pos, alpha, beta);
+
+  pos2D = rotateCoordinates(pos2D, delta);
+
+  pos2D = translateCoordinates(pos2D, xTranslation, yTranslation);
+
+  pos2D = adaptCoordinatesToCanvasFrame(pos2D, canvasWidth, canvasHeight);
+
+  // Drawing line
+  canvasContext.beginPath();
+  var j; // creating count variable
+  canvasContext.moveTo(pos2D[0][0], pos2D[0][1]);
+  for (j = 1; j < pos2D.length; j++) {
+    canvasContext.lineTo(pos2D[j][0], pos2D[j][1]);
+  }
+  canvasContext.stroke();
+}
+
+function getInputParameters() {
+  /*
+  This function assigns parameters values entered by the user in the input forms to the
+  calculation variables
+  */
 
   // simulation parameters
 
   // simulation duration (s)
-  dur = parseFloat(document.getElementById('input_dur').value * 86400);
+  dur = parseFloat(document.getElementById('DurationInput').value * 86400);
   // step time (s) and number of steps (-)
-  if (document.getElementById('radio_step_time').checked) {
-    dt = parseFloat(document.getElementById('step_time').value);
-    step_nb = dur / dt;
+  if (document.getElementById('StepTimeRadioButton').checked) {
+    dt = parseFloat(document.getElementById('StepTimeInput').value);
+    numberOfSteps = dur / dt;
   } else {
-    step_nb = parseInt(document.getElementById('step_nb').value, 10);
-    dt = dur / step_nb;
+    numberOfSteps = parseInt(
+      document.getElementById('NumberOfStepsInput').value,
+      10
+    );
+    dt = dur / numberOfSteps;
   }
 
   // orbital parameters
 
   // semi-major axis (km)
-  a = parseFloat(document.getElementById('input_a').value);
+  a = parseFloat(document.getElementById('SemiMajorAxisInput').value);
   // eccentricity (-)
-  e = parseFloat(document.getElementById('input_e').value);
+  e = parseFloat(document.getElementById('EccentricityInput').value);
   // inclination (deg)
-  i = parseFloat(document.getElementById('input_i').value);
-  // right ascension of the ascending node (deg)
-  RAAN = 0;
+  i = parseFloat(document.getElementById('InclinationInput').value);
   // argument of periapsis (deg)
-  om = parseFloat(document.getElementById('input_om').value);
+  om = parseFloat(document.getElementById('ArgumentPeriapsisInput').value);
+}
 
-  // getting positions for each simulation step
+/*User-Interaction-related functions****************************************************************
+***************************************************************************************************/
 
-  var j; // creating count variable
-  for (j = 0; j < step_nb; j++) {
-    pos[j] = orb2car(a, e, i, RAAN, om, j * dt, mu_planet);
-    pos[j] = rot_frame(pos[j], j * dt, rot_planet);
-  }
+document.getElementById('DrawButton').onclick = function drawButton() {
+  /*
+  This function gets the user-entered input parameters, computes the corresponding orbiting object
+  positions, resizes the positions coordinates to fit the canvas size, and draws the trajectory on
+  the canvas
+	*/
 
-  // getting size of the drawing
-  size = getextr(pos) * 2;
+  getInputParameters();
 
-  // resizing positions to fit the graph
-  pos = list_prod(pos, cheight / size * 9 / 10);
+  pos = computePositions(
+    a,
+    e,
+    i,
+    RAAN,
+    om,
+    MU_PLANET,
+    ROT_PLANET,
+    numberOfSteps,
+    dt
+  );
 
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
+  pos = resizeDrawingToFitCanvas(pos, canvas.height);
 
-  // translating object and converting positions reference frame to fit the HTML canvas
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-/*Second part of the script*****************************************
+document.getElementById('ClearButton').onclick = function clearButton() {
+  /*
+  This functions clears the canvas and sets the plane angles and drawing translations to zero
+  */
 
-This part of the script contains functions that allow the user to
-manipulate the drawing.
-
-Function:
-	- clearing canvas
-	- recentering drawing
-	- positive rotation of projection plane around intersection of
-	itself and OXY ("up")
-	- negative rotation of projection plane around intersection of
-	itself and OXY ("down")
-	- positive rotation of projection plane around axis OZ ("left")
-	- negative rotation of projection plane around axis OZ ("right")
-	- positive rotation of coordinates along normal to projection plane
-	("clockwise")
-	- negative rotation of coordinates along normal to projection plane
-	("counterclockwise")
-	- zoom in
-	- zoom out
-	- adapt size of the drawing to size of the canvas
-	- play an animation of the trajectory
-	- stop animation of the trajectory
-
-
-*******************************************************************/
-
-// clearing the canvas when clicking the "clear" button
-document.getElementById('bt_clear').onclick = function() {
-  ctx.clearRect(0, 0, cheight, cheight);
+  canvasContext.clearRect(0, 0, canvas.width, canvas.height);
   alpha = 0;
   beta = 0;
   delta = 0;
-  dx = 0;
-  dy = 0;
+  xTranslation = 0;
+  yTranslation = 0;
 };
 
-// recentering the drawing when clicking the "center" button
-document.getElementById('bt_center').onclick = function() {
-  if (document.getElementById('checkbox_translate').checked) {
+document.getElementById('CenterButton').onclick = function centerButton() {
+  /*
+  This function recenters the drawing by setting the translation and angle variables to zero
+  It then draws the orbit again
+  */
+
+  if (document.getElementById('TranslateCheckbox').checked) {
     // resetting object shift from center to zero
-    dx = 0;
-    dy = 0;
+    xTranslation = 0;
+    yTranslation = 0;
   } else {
     // resetting projection plane direction angles to zero
     alpha = 0;
@@ -423,435 +495,332 @@ document.getElementById('bt_center').onclick = function() {
     delta = 0;
   }
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "up": positive rotation of projection plane around intersection of itself and OXY
-document.getElementById('bt_up').onclick = function() {
-  if (document.getElementById('checkbox_translate').checked) {
-    dy = dy - 5; // shifting object from center
+document.getElementById('UpButton').onclick = function upButton() {
+  /*
+  This function either:
+    - executes a positive rotation of the projection plane around the intersection of
+      itself and of the OXY plane, by increasing
+    - or translates the drawing along the y-axis
+  */
+
+  if (document.getElementById('TranslateCheckbox').checked) {
+    yTranslation = yTranslation - 5; // shifting object from center
   } else {
     alpha = alpha + 5 * Math.PI / 180; // rotating projection plane
   }
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "down": negative rotation of projection plane around intersection of itself and OXY
-document.getElementById('bt_down').onclick = function() {
-  if (document.getElementById('checkbox_translate').checked) {
-    dy = dy + 5; // shifting object from center
+document.getElementById('DownButton').onclick = function downButton() {
+  /*
+  This function either:
+    - executes a negative rotation of the projection plane around the intersection of
+      itself and of the OXY plane, by increasing
+    - or translates the drawing along the y-axis
+  */
+
+  if (document.getElementById('TranslateCheckbox').checked) {
+    yTranslation = yTranslation + 5; // shifting object from center
   } else {
     alpha = alpha - 5 * Math.PI / 180; // rotating projection plane
   }
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "left": positive rotation of projection plane around axis OZ
-document.getElementById('bt_left').onclick = function() {
-  if (document.getElementById('checkbox_translate').checked) {
-    dx = dx + 5; // shifting object from center
+document.getElementById('LeftButton').onclick = function leftButton() {
+  /*
+  This function either:
+    - executes a positive rotation of the projection plane around axis OZ, by increasing
+    - or translates the drawing along the x-axis
+  */
+
+  if (document.getElementById('TranslateCheckbox').checked) {
+    xTranslation = xTranslation + 5; // shifting object from center
   } else {
     beta = beta + 5 * Math.PI / 180; // rotating projection plane
   }
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "right": negative rotation of projection plane around axis OZ
-document.getElementById('bt_right').onclick = function() {
-  if (document.getElementById('checkbox_translate').checked) {
-    dx = dx - 5; // shifting object from center
+document.getElementById('RightButton').onclick = function rightButton() {
+  /*
+  This function either:
+    - executes a negative rotation of the projection plane around axis OZ, by increasing
+    - or translates the drawing along the x-axis
+  */
+
+  if (document.getElementById('TranslateCheckbox').checked) {
+    xTranslation = xTranslation - 5; // shifting object from center
   } else {
     beta = beta - 5 * Math.PI / 180; // rotating projection plane
   }
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "clockwise": positive rotation of coordinates along normal to projection plane
-document.getElementById('bt_clockwise').onclick = function() {
+document.getElementById(
+  'ClockwiseButton'
+).onclick = function clockwiseButton() {
+  /*
+  This function executes a positive rotation of the coordinates around the normal to the projection
+  plane
+  */
+
   delta = delta + 5 * Math.PI / 180; // rotating projection plane
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "counterclockwise": negative rotation of coordinates along normal to projection plane
-document.getElementById('bt_counterclockwise').onclick = function() {
+document.getElementById(
+  'CounterclockwiseButton'
+).onclick = function counterclockwiseButton() {
+  /*
+  This function executes a negative rotation of the coordinates around the normal to the projection
+  plane
+  */
+
   delta = delta - 5 * Math.PI / 180; // rotating projection plane
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// zoom in
-document.getElementById('bt_zoom_in').onclick = function() {
+document.getElementById('ZoomInButton').onclick = function zoomInButton() {
+  /*
+  This function executes a zoom in
+  */
+
   // increasing values of positions array
-  pos = list_prod(pos, 1.1);
+  pos = multiplyArrayByScalar(pos, 1.1);
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// zoom out
-document.getElementById('bt_zoom_out').onclick = function() {
+document.getElementById('ZoomOutButton').onclick = function zoomOutButton() {
+  /*
+  This function executes a zoom out
+  */
+
   // decreasing values of positions array
-  pos = list_prod(pos, 0.9);
+  pos = multiplyArrayByScalar(pos, 0.9);
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
-
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// "adapt size": resizing the drawing to fit the canvas
-document.getElementById('bt_adapt_size').onclick = function() {
-  // resizing positions to fit the graph
-  pos = list_prod(pos, cheight / 2 / getextr(pos) * 9 / 10);
+document.getElementById(
+  'AdaptSizeButton'
+).onclick = function adaptSizeButton() {
+  /*
+  This function resizes the drawing to fit the canvas size
+  */
 
-  // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
+  pos = resizeDrawingToFitCanvas(pos, canvas.height);
 
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  for (j = 0; j < pos.length; j++) {
-    pos_2d[j] = proj(pos[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] = pos_2d[j][0] + cheight / 2 + dx;
-    pos_2d[j][1] = -pos_2d[j][1] + cheight / 2 - dy;
-  }
-
-  // Drawing line
-  ctx.beginPath();
-  var j; // creating count variable
-  ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  ctx.stroke();
+  drawOrbit(
+    pos,
+    alpha,
+    beta,
+    delta,
+    xTranslation,
+    yTranslation,
+    canvasContext,
+    canvas.width,
+    canvas.height
+  );
 };
 
-// play animation
-document.getElementById('bt_animation').onclick = function() {
+document.getElementById(
+  'PlayAnimationButton'
+).onclick = function playAnimationButton() {
+  /*
+  This function displays the orbiting object's trajectory step by step in an animation
+  */
+
   // clearing the canvas
-  ctx.clearRect(0, 0, cheight, cheight);
+  canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
   // drawing a new point every millisecond
   function animate() {
     var j = 0;
     timer = setInterval(function() {
-      ctx.beginPath();
-      ctx.moveTo(pos_2d[j][0], pos_2d[j][1]);
-      ctx.lineTo(pos_2d[j + 1][0], pos_2d[j + 1][1]);
-      ctx.stroke();
+      canvasContext.beginPath();
+      canvasContext.moveTo(pos2D[j][0], pos2D[j][1]);
+      canvasContext.lineTo(pos2D[j + 1][0], pos2D[j + 1][1]);
+      canvasContext.stroke();
       j++;
     }, 1);
   }
   animate();
 };
 
-// stop animation
-document.getElementById('bt_animation_stop').onclick = function() {
+document.getElementById(
+  'StopAnimationButton'
+).onclick = function stopAnimationButton() {
+  /*
+  This function stops the animation
+  */
+
   clearTimeout(timer);
 };
 
-/*Third part of the script*****************************************
-
-This part of the script contains functions that allow the user to
-store the drawing, as well as a request to display all images from
-the gallery on the page
-
-Functions:
-	- Download picture
-	- Upload picture to the gallery
-
-*******************************************************************/
-
-// download picture
-document.getElementById('bt_dl').onclick = function() {
+document.getElementById('DownloadButton').onclick = function downloadButton() {
   /*
 	In this function, a new canvas with a different resolution is created
 	The trajectory is plotted again on this new canvas, and it is downloaded
 	*/
 
-  if (document.getElementById('dl_res').value == 600) {
+  if (document.getElementById('DownloadResolution').value == 600) {
     // creating a 600x600px canvas
-    var canvas_tobedl = document.createElement('canvas');
-    canvas_tobedl.width = 600;
-    canvas_tobedl.height = 600;
-  } else if (document.getElementById('dl_res').value == 1000) {
+    var canvasToDownload = document.createElement('canvas');
+    canvasToDownload.width = 600;
+    canvasToDownload.height = 600;
+  } else if (document.getElementById('DownloadResolution').value == 1000) {
     // creating a 1000x1000px canvas
-    var canvas_tobedl = document.createElement('canvas');
-    canvas_tobedl.width = 1000;
-    canvas_tobedl.height = 1000;
-  } else if (document.getElementById('dl_res').value == 2000) {
+    var canvasToDownload = document.createElement('canvas');
+    canvasToDownload.width = 1000;
+    canvasToDownload.height = 1000;
+  } else if (document.getElementById('DownloadResolution').value == 2000) {
     // creating a 2000x2000px canvas
-    var canvas_tobedl = document.createElement('canvas');
-    canvas_tobedl.width = 2000;
-    canvas_tobedl.height = 2000;
-  } else if (document.getElementById('dl_res').value == 10000) {
+    var canvasToDownload = document.createElement('canvas');
+    canvasToDownload.width = 2000;
+    canvasToDownload.height = 2000;
+  } else if (document.getElementById('DownloadResolution').value == 10000) {
     // creating a 10000x10000px canvas
-    var canvas_tobedl = document.createElement('canvas');
-    canvas_tobedl.width = 10000;
-    canvas_tobedl.height = 10000;
+    var canvasToDownload = document.createElement('canvas');
+    canvasToDownload.width = 10000;
+    canvasToDownload.height = 10000;
   }
 
   //creating canvas context
-  canvas_tobedl_ctx = canvas_tobedl.getContext('2d');
-  canvas_tobedl_ctx.lineWidth = 0.3 * canvas_tobedl.height / cheight; // setting line width
+  canvasToDownloadContext = canvasToDownload.getContext('2d');
+  canvasToDownloadContext.lineWidth =
+    0.3 * canvasToDownload.height / canvas.height; // setting line width
 
   // adjusting image size to new canvas resolution
-  pos_dl = list_prod(pos, canvas_tobedl.height / cheight);
+  posCanvasToDownload = multiplyArrayByScalar(
+    pos,
+    canvasToDownload.height / canvas.height
+  );
 
-  // Projecting points on 2D plane
-  var j; // creating count variable
-  var pos_2d = [[]]; // creating array of 2D positions
-  for (j = 0; j < pos_dl.length; j++) {
-    pos_2d[j] = proj(pos_dl[j], alpha, beta, delta);
-  }
-
-  // translating object and converting positions to fit the HTML canvas frame
-  var j; // creating count variable
-  for (j = 0; j < pos_2d.length; j++) {
-    pos_2d[j][0] =
-      pos_2d[j][0] +
-      canvas_tobedl.width / 2 +
-      dx * canvas_tobedl.height / cheight;
-    pos_2d[j][1] =
-      -pos_2d[j][1] +
-      canvas_tobedl.height / 2 -
-      dy * canvas_tobedl.height / cheight;
-  }
-
-  // Drawing line
-  canvas_tobedl_ctx.beginPath();
-  var j; // creating count variable
-  canvas_tobedl_ctx.moveTo(pos_2d[0][0], pos_2d[0][1]);
-  for (j = 1; j < pos_2d.length; j++) {
-    canvas_tobedl_ctx.lineTo(pos_2d[j][0], pos_2d[j][1]);
-  }
-  canvas_tobedl_ctx.stroke();
+  drawOrbit(
+    posCanvasToDownload,
+    alpha,
+    beta,
+    delta,
+    xTranslation * canvasToDownload.width / canvas.width,
+    yTranslation * canvasToDownload.height / canvas.height,
+    canvasToDownloadContext,
+    canvasToDownload.width,
+    canvasToDownload.height
+  );
 
   // creating a (fictional) link to download the file
-  var download_link = document.createElement('a');
-  download_link.download = 'Erdorbit.png'; // file name
+  var downloadLink = document.createElement('a');
+  downloadLink.download = 'Erdorbit.png'; // file name
 
   //storing canvas data in a blob object for downloading
-  canvas_tobedl.toBlob(function(blob) {
-    download_link.href = URL.createObjectURL(blob); //creating data URL
-    download_link.click(); //
+  canvasToDownload.toBlob(function(blob) {
+    downloadLink.href = URL.createObjectURL(blob); //creating data URL
+    downloadLink.click(); //
   }, 'image/png');
 };
 
-// upload picture to gallery
-document.getElementById('bt_upload').onclick = function() {
+document.getElementById('UploadButton').onclick = function uploadButton() {
   /*
 	In this function, the parameters entered by the user are stored
 	in a variable, and sent to the server along with the canvas data
@@ -877,21 +846,21 @@ document.getElementById('bt_upload').onclick = function() {
     ',' +
     String(dur / 86400) +
     ',' + // simulation duration is stored in days
-    String(step_nb);
+    String(numberOfSteps);
 
   // getting username
-  var username = document.getElementById('username').value;
-  var useremail = document.getElementById('useremail').value;
+  var username = document.getElementById('UsernameInput').value;
+  var useremail = document.getElementById('UserEmailInput').value;
 
   // getting URL of canvas data
-  var canvas_dataURL = canvas.toDataURL();
+  var canvasDataURL = canvas.toDataURL();
 
   // ajax request to send data to server
   $.ajax({
     type: 'POST', // type of ajax request best fit for large amount of data
     url: 'upload.php', // URL to send request to
     data: {
-      imgBase64: canvas_dataURL, // sending canvas data encrypted in base 64
+      imgBase64: canvasDataURL, // sending canvas data encrypted in base 64
       username: username,
       useremail: useremail,
       drawing_param: drawing_param
@@ -901,6 +870,9 @@ document.getElementById('bt_upload').onclick = function() {
     console.log('upload complete'); // displaying success in the console
   });
 };
+
+/*Gallery-related ajax request**********************************************************************
+***************************************************************************************************/
 
 // displaying all png images from the gallery directory to the html page
 $.ajax({
@@ -928,7 +900,7 @@ $.ajax({
     for (j = 0; j < csv.length; j++) {
       if (csv[j][2]) {
         // in case a username was given
-        $('#gallery_div').append(
+        $('#GalleryDiv').append(
           "<img src='gallery/" +
           'Bild' +
           csv[j][0] +
@@ -937,12 +909,12 @@ $.ajax({
           '_' +
           csv[j][4] +
           ".png'><br>" + // append image link
-          "<div class='tooltip'>" +
+          "<div class='Tooltip'>" +
           'Bild' +
           csv[j][0] +
           '_' +
           csv[j][1] + // image label text
-          "<span class='tooltiptext'>" + // tooltip image info
+          "<span class='TooltipText'>" + // tooltip image info
             '<u>Uploaded by:</u><br>' +
             csv[j][2] +
             '<br>' +
@@ -969,7 +941,7 @@ $.ajax({
         );
       } else {
         // in cas no username was given
-        $('#gallery_div').append(
+        $('#GalleryDiv').append(
           "<img src='gallery/" +
           'Bild' +
           csv[j][0] +
@@ -978,12 +950,12 @@ $.ajax({
           '_' +
           csv[j][4] +
           ".png'><br>" + // append image link
-          "<div class='tooltip'>" +
+          "<div class='Tooltip'>" +
           'Bild' +
           csv[j][0] +
           '_' +
           csv[j][1] + // image label text
-          "<span class='tooltiptext'>" + // tooltip image info
+          "<span class='TooltipText'>" + // tooltip image info
             '<u>Parameters:</u><br>' +
             'a(km):' +
             csv[j][5] +
