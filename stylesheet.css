@@ -30,7 +30,7 @@ p {
   font-size: 1em;
 }
 
-.p_small {
+.SmallParagraph {
   font-size: 0.83em;
   display: inline-block;
 }
@@ -65,7 +65,7 @@ td {
   margin-left: auto;
 }
 
-.tooltip {
+.Tooltip {
   border: none;
   margin: 0px;
   padding: 0px;
@@ -74,7 +74,7 @@ td {
   font-size: 1em;
 }
 
-.tooltip .tooltiptext {
+.Tooltip .TooltipText {
   visibility: hidden;
   border: 0.5px solid black;
   border-radius: 5px;
@@ -89,13 +89,13 @@ td {
   z-index: 999;
 }
 
-.tooltip:hover .tooltiptext {
+.Tooltip:hover .TooltipText {
   visibility: visible;
 }
 
 /* Header properties */
 
-#header {
+#HeaderDiv {
   display: block;
   border-bottom: 1px solid black;
   margin: 0px 0px 20px 0px;
@@ -104,18 +104,18 @@ td {
 
 /* Simulation div properties */
 
-#simulation_div {
+#SimulationDiv {
   padding: 100px 0px 100px 0px;
 }
 
-#graph_div {
+#GraphDiv {
   width: 600px;
   height: 621px;
   float: right;
   position: relative;
 }
 
-#canvas {
+#Canvas {
   border: 1px solid black;
   height: 500px;
   width: 500px;
@@ -125,7 +125,7 @@ td {
   left: 39px;
 }
 
-#graph_buttons_form {
+#CanvasUI {
   height: 60px;
   width: 145px;
   padding: 5px;
@@ -136,7 +136,7 @@ td {
 
 /* Graph buttons properties */
 
-#bt_up {
+#UpButton {
   background: url(images/arrow-up.png);
   background-position: center;
   height: 20px;
@@ -146,7 +146,7 @@ td {
   left: 25px;
 }
 
-#bt_down {
+#DownButton {
   background: url(images/arrow-down.png);
   background-position: center;
   height: 20px;
@@ -156,7 +156,7 @@ td {
   left: 25px;
 }
 
-#bt_left {
+#LeftButton {
   background: url(images/arrow-left.png);
   background-position: center;
   height: 20px;
@@ -166,7 +166,7 @@ td {
   left: 5px;
 }
 
-#bt_right {
+#RightButton {
   background: url(images/arrow-right.png);
   background-position: center;
   height: 20px;
@@ -176,7 +176,7 @@ td {
   left: 45px;
 }
 
-#bt_counterclockwise {
+#CounterclockwiseButton {
   background: url(images/counterclockwise.png);
   background-position: center;
   height: 20px;
@@ -186,7 +186,7 @@ td {
   left: 45px;
 }
 
-#bt_clockwise {
+#ClockwiseButton {
   background: url(images/clockwise.png);
   background-position: center;
   height: 20px;
@@ -196,7 +196,7 @@ td {
   left: 5px;
 }
 
-#bt_center {
+#CenterButton {
   background: url(images/center.png);
   background-position: center;
   height: 20px;
@@ -206,7 +206,7 @@ td {
   left: 25px;
 }
 
-#bt_zoom_in {
+#ZoomInButton {
   background: url(images/zoom-in.png);
   background-position: center;
   height: 20px;
@@ -216,7 +216,7 @@ td {
   left: 5px;
 }
 
-#bt_zoom_out {
+#ZoomOutButton {
   background: url(images/zoom-out.png);
   background-position: center;
   height: 20px;
@@ -226,7 +226,7 @@ td {
   left: 45px;
 }
 
-#checkbox_translate {
+#TranslateCheckbox {
   height: 14px;
   width: 14px;
   margin: 1px;
@@ -236,7 +236,7 @@ td {
   left: 70px;
 }
 
-#text_translate {
+#TranslateLabel {
   height: 20px;
   width: 60px;
   padding: 3px 0px 0px 0px;
@@ -246,7 +246,7 @@ td {
   left: 90px;
 }
 
-#bt_animation {
+#PlayAnimationButton {
   background: url(images/play.png);
   background-position: center;
   height: 20px;
@@ -256,7 +256,7 @@ td {
   left: 70px;
 }
 
-#bt_animation_stop {
+#StopAnimationButton {
   background: url(images/stop.png);
   background-position: center;
   height: 20px;
@@ -266,7 +266,7 @@ td {
   left: 90px;
 }
 
-#bt_adapt_size {
+#AdaptSizeButton {
   height: 20px;
   width: 80px;
   position: absolute;
@@ -276,14 +276,14 @@ td {
 
 /* Parameters div properties */
 
-#parameters_div {
+#ParametersDiv {
   width: 600px;
   height: 621px;
   float: left;
   position: relative;
 }
 
-#orbit_param_form {
+#OrbitalParametersForm {
   height: 300px;
   width: 258px;
   padding: 10px;
@@ -293,7 +293,7 @@ td {
   left: 0px;
 }
 
-#simul_param_form {
+#SimulationParametersForm {
   height: 300px;
   width: 258px;
   padding: 10px;
@@ -303,7 +303,7 @@ td {
   right: 0px;
 }
 
-#param_buttons_form {
+#ParametersUI {
   height: 241px;
   width: 558px;
   padding: 10px;
@@ -313,7 +313,7 @@ td {
   left: 0px;
 }
 
-#param_buttons_div {
+#DrawingUI {
   height: 216px;
   width: 166px;
   padding: 10px;
@@ -323,7 +323,7 @@ td {
   left: 0px;
 }
 
-#bt_draw {
+#DrawButton {
   height: 50px;
   width: 60px;
   position: absolute;
@@ -331,7 +331,7 @@ td {
   left: 62px;
 }
 
-#bt_clear {
+#ClearButton {
   height: 50px;
   width: 60px;
   position: absolute;
@@ -339,7 +339,7 @@ td {
   left: 62px;
 }
 
-#dl_div {
+#DownloadUI {
   height: 216px;
   width: 166px;
   padding: 10px;
@@ -349,7 +349,7 @@ td {
   left: 186px;
 }
 
-#upload_div {
+#UploadUI {
   height: 216px;
   width: 166px;
   padding: 10px;
@@ -361,7 +361,7 @@ td {
 
 /* Explanation div properties */
 
-#explanation_div {
+#ExplanationDiv {
   border-top: 1px solid black;
   clear: both;
   padding: 100px 200px 100px 200px;
@@ -369,7 +369,7 @@ td {
 
 /* Gallery div properties */
 
-#gallery_div {
+#GalleryDiv {
   display: block;
   border-top: 1px solid black;
   clear: both;
@@ -379,7 +379,7 @@ td {
 
 /* Footer div properties */
 
-#footer {
+#FooterDiv {
   display: block;
   clear: both;
   border-top: 1px solid black;
