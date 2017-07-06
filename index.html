@@ -20,160 +20,162 @@ author: thibaut voirand
 
 	<body>
 
-		<div id="header">
+		<div id="HeaderDiv">
 
 			<h1> Erdorbit </h1>
 
 		</div>
 
-		<div id="simulation_div">
+		<div id="SimulationDiv">
 
-			<div id="graph_div">
+			<div id="GraphDiv">
 
-				<canvas id="canvas" width="600" height="600">
+				<canvas id="Canvas" width="600" height="600">
 				This text is displayed if your browser does not support
 				HTML5 Canvas.
 				</canvas>
 
-				<form id="graph_buttons_form">
+				<form id="CanvasUI">
 
-					<input type="button" class="button" id="bt_up">
-					<input type="button" class="button" id="bt_down">
-					<input type="button" class="button" id="bt_left">
-					<input type="button" class="button" id="bt_right">
+					<input type="button" class="button" id="UpButton">
+					<input type="button" class="button" id="DownButton">
+					<input type="button" class="button" id="LeftButton">
+					<input type="button" class="button" id="RightButton">
 
-					<input type="button" class="button" id="bt_center">
-					<input type="button" class="button" id="bt_clockwise">
-					<input type="button" class="button" id="bt_counterclockwise">
+					<input type="button" class="button" id="CenterButton">
+					<input type="button" class="button" id="ClockwiseButton">
+					<input type="button" class="button" id="CounterclockwiseButton">
 
-					<input type="button" class="button" id="bt_zoom_in">
-					<input type="button" class="button" id="bt_zoom_out">
+					<input type="button" class="button" id="ZoomInButton">
+					<input type="button" class="button" id="ZoomOutButton">
 
-					<input type="button" class="button" id="bt_animation">
-					<input type="button" class="button" id="bt_animation_stop">
+					<input type="button" class="button" id="PlayAnimationButton">
+					<input type="button" class="button" id="StopAnimationButton">
 
-					<input type="checkbox" id="checkbox_translate">
-					<label for="checkbox_translate" id="text_translate"> <p class="p_small">Translate</p> </label>
+					<input type="checkbox" id="TranslateCheckbox">
+					<label for="TranslateCheckbox" id="TranslateLabel"> <p class="SmallParagraph">Translate</p> </label>
 
-					<input type="button" class="button" id="bt_adapt_size" value="Adapt size">
+					<input type="button" class="button" id="AdaptSizeButton" value="Adapt size">
 
 				</form>
 
 			</div>
 
-			<div id="parameters_div">
+			<div id="ParametersDiv">
 
 
-				<form id="orbit_param_form">
+				<form id="OrbitalParametersForm">
 
 					<h3>Orbital Parameters</h3>
-					<div class="tooltip">
+
+					<div class="Tooltip">
 						<p>Semi-major axis (km)</p>
-						<span class="tooltiptext">
+						<span class="TooltipText">
 							Affects the size of the orbit
 						</span>
 					</div>
 					<br>
-					<input type="text" name="input_a" value="7000" id="input_a" size="10"> 
-					<p class="p_small"> must be > 0 </p>
+					<input type="text" name="SemiMajorAxisInput" value="7000" id="SemiMajorAxisInput" size="10">
+					<p class="SmallParagraph"> must be > 0 </p>
 					<br>
 					<br>
 
-					<div class="tooltip">
+					<div class="Tooltip">
 						<p>Eccentricity (-)</p>
-						<span class="tooltiptext">
+						<span class="TooltipText">
 							Affects the form of the orbit
 						</span>
 					</div>
 					<br>
-					<input type="text" name="input_e" value="0.6" id="input_e" size="10"> 
-					<p class="p_small"> must be between 0 and 1 </p>
+					<input type="text" name="EccentricityInput" value="0.7" id="EccentricityInput" size="10">
+					<p class="SmallParagraph"> must be between 0 and 1 </p>
 					<br>
 					<br>
-					<div class="tooltip">
+
+					<div class="Tooltip">
 						<p>Inclination (deg) </p>
-						<span class="tooltiptext">
+						<span class="TooltipText">
 							Affects the orientation of the orbit
 						</span>
 					</div>
 					<br>
-					<input type="text" name="input_i" value="30" id="input_i" size="10"> <br>
+					<input type="text" name="InclinationInput" value="80" id="InclinationInput" size="10"> <br>
 					<br>
-					<div class="tooltip">
+
+					<div class="Tooltip">
 						<p>Argument of periapsis (deg) </p>
-						<span class="tooltiptext">
+						<span class="TooltipText">
 							Affects the orientation of the orbit
 						</span>
 					</div>
 					<br>
-					<input type="text" name="input_om" value="10" id="input_om" size="10"> <br>
+					<input type="text" name="ArgumentPeriapsisInput" value="30" id="ArgumentPeriapsisInput" size="10"> <br>
 
 				</form>
 
 
-				<form id="simul_param_form">
+				<form id="SimulationParametersForm">
 
 					<h3>Simulation Parameters</h3>
 
 					<p>Duration (days)</p>
-					<input type="text" name="input_dur" value="10" id="input_dur" size="10"> <br>
+					<input type="text" name="DurationInput" value="10" id="DurationInput" size="10"> <br>
 					<br>
 
 					<p>
-						<input type="radio" name="radio_step" id="radio_step_nb" value="radio_step_nb" checked>
-						<label for="radio_step_nb"> Number of steps (-) </label>
+						<input type="radio" name="StepsMethodRadioButton" id="NumberOfStepsRadioButton" value="NumberOfStepsRadioButton" checked>
+						<label for="NumberOfStepsRadioButton"> Number of steps (-) </label>
 					</p>
-					<input type="text" name="step_nb" value="30000" id="step_nb" size="10">
+					<input type="text" name="NumberOfStepsInput" value="30000" id="NumberOfStepsInput" size="10">
 					<br>
 
 					<br>
 					<p>
-						<input type="radio" name="radio_step" id="radio_step_time" value="radio_step_time">
-						<label for="radio_step_time" id="label_step_time"> Step-time (s)</label>
+						<input type="radio" name="StepsMethodRadioButton" id="StepTimeRadioButton" value="StepTimeRadioButton">
+						<label for="StepTimeRadioButton"> Step-time (s)</label>
 					</p>
-					<input type="text" name="step_time" value="100" id="step_time" size="10">
+					<input type="text" name="StepTimeInput" value="100" id="StepTimeInput" size="10">
 					<br>
 
 				</form>
 
 
-				<form id="param_buttons_form">
+				<form id="ParametersUI">
 
-					<div id="param_buttons_div">
+					<div id="DrawingUI">
 
-						<input type="button" class="button" id="bt_draw" value="Draw">
-						<input type="button" class="button" id="bt_clear" value="Clear">
+						<input type="button" class="button" id="DrawButton" value="Draw">
+						<input type="button" class="button" id="ClearButton" value="Clear">
 
 					</div>
 
-					<div id="dl_div">
+					<div id="DownloadUI">
 
 						<p style="font-weight:bold">Download as image:</p>
 						<br>
-						<select id="dl_res">
+						<select id="DownloadResolution">
 							<option value="600">600x600px</option>
-							<option value="640">640x480px</option>
-							<option value="1024">1024x768px</option>
-							<option value="1152">1152x864px</option>
-							<option value="1600">1600x1200px</option>
+							<option value="1000">1000x1000px</option>
+							<option value="2000">2000x2000px</option>
+							<option value="10000">10000x10000px</option>
 						</select>
 						<br>
 						<br>
-						<input type="button" class="button" id="bt_dl" value="Download">
+						<input type="button" class="button" id="DownloadButton" value="Download">
 
 					</div>
 
-					<div id="upload_div">
+					<div id="UploadUI">
 
 						<p style="font-weight:bold">Upload to gallery:</p>
 						<br>
 						<p>Username (optional)</p>
-						<input type="text" name="username" id="username"><br>
+						<input type="text" name="UsernameInput" id="UsernameInput"><br>
 						<br>
 						<p>Email adress (optional)</p>
-						<input type="text" name="useremail" id="useremail"><br>
+						<input type="text" name="UserEmailInput" id="UserEmailInput"><br>
 						<br>
-						<input type="button" class="button" id="bt_upload" value="Upload">
+						<input type="button" class="button" id="UploadButton" value="Upload">
 
 					</div>
 
@@ -186,7 +188,7 @@ author: thibaut voirand
 
 		</div>
 
-		<div id="explanation_div">
+		<div id="ExplanationDiv">
 
 			<br><h3>Explanation</h3><br>
 
@@ -313,15 +315,16 @@ author: thibaut voirand
 
 		</div>
 
-		<div id="gallery_div">
+		<div id="GalleryDiv">
 
 			<br><h3>Gallery</h3><br>
 
 		</div>
 
-		<div id="footer">
+		<div id="FooterDiv">
 
 			<p>
+				v1.1.0 <br>
 				Copyright Thibaut Voirand <br>
 				thibautvoirand@gmail.com <br>
 			</p>
