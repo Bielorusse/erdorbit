@@ -2,6 +2,21 @@
 
 
 #--------------------------------------------------------------------
+# Specific to Erdorbit
+
+brouillon.txt
+
+
+#--------------------------------------------------------------------
+# Specific to Python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+#--------------------------------------------------------------------
 # Specific to MacOS
 
 # General
