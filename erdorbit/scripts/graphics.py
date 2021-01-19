@@ -21,8 +21,6 @@ def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
     # assuming size of object to draw is 2 times largest value in positions array
     drawing_size = np.max(np.asarray(positions)) * 2
 
-    print(drawing_size)
-
     return np.asarray(positions) * canvas_height / drawing_size * DRAWING_SIZE_FACTOR
 
 def planar_projection(input_array, alpha, beta):

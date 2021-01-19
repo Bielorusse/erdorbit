@@ -73,12 +73,8 @@ def erdorbit(config_file=None):
         step_time
     )
 
-    print(positions[:3])
-
     # resizing to canvas
     positions = resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR)
-
-    print(positions[:3])
 
     # drawing orbit
     draw_orbit(
