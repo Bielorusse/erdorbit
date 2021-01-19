@@ -46,7 +46,7 @@ def erdorbit(config_file=None):
         sys.exit("Error reading config")
     a = float(config["calculation"]["a"])
     e = float(config["calculation"]["e"])
-    i = float(config["calculation"]["i"])
+    inc = float(config["calculation"]["i"])
     RAAN = float(config["calculation"]["RAAN"])
     om = float(config["calculation"]["om"])
 
@@ -62,19 +62,13 @@ def erdorbit(config_file=None):
 
     # computing positions
     positions = compute_positions(
-        a,
-        e,
-        i,
-        RAAN,
-        om,
-        MU_PLANET,
-        ROT_PLANET,
-        number_of_steps,
-        step_time
+        a, e, inc, RAAN, om, MU_PLANET, ROT_PLANET, number_of_steps, step_time
     )
 
     # resizing to canvas
-    positions = resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR)
+    positions = resize_drawing_to_fit_canvas(
+        positions, canvas_height, DRAWING_SIZE_FACTOR
+    )
 
     # drawing orbit
     draw_orbit(
@@ -85,7 +79,7 @@ def erdorbit(config_file=None):
         x_translation,
         y_translation,
         canvas_width,
-        canvas_height
+        canvas_height,
     )
 
 

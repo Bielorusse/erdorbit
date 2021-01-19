@@ -7,6 +7,7 @@ import numpy as np
 from processing_py import *
 from tqdm import tqdm
 
+
 def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
     """
     This function resizes the drawing to fit the canvas size
@@ -23,6 +24,7 @@ def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
 
     return np.asarray(positions) * canvas_height / drawing_size * DRAWING_SIZE_FACTOR
 
+
 def planar_projection(input_array, alpha, beta):
     """
     Projecting an array of 3D coordinates on a plane
@@ -36,14 +38,17 @@ def planar_projection(input_array, alpha, beta):
 
     output_array = []
     for i in range(len(input_array)):
-        output_array.append([
-            np.cos(beta) * input_array[i][0] - np.sin(beta) * input_array[i][1],
-            -np.sin(beta) * np.sin(alpha) * input_array[i][0] -
-            np.cos(beta) * np.sin(alpha) * input_array[i][1] +
-            np.cos(alpha) * input_array[i][2]
-        ])
+        output_array.append(
+            [
+                np.cos(beta) * input_array[i][0] - np.sin(beta) * input_array[i][1],
+                -np.sin(beta) * np.sin(alpha) * input_array[i][0]
+                - np.cos(beta) * np.sin(alpha) * input_array[i][1]
+                + np.cos(alpha) * input_array[i][2],
+            ]
+        )
 
     return output_array
+
 
 def rotate_coordinates(input_coords, delta):
     """
@@ -59,12 +64,15 @@ def rotate_coordinates(input_coords, delta):
     output_coords = []
 
     for i in range(len(input_coords)):
-        output_coords.append([
-            np.cos(delta) * input_coords[i][0] + np.sin(delta) * input_coords[i][1],
-            np.cos(delta) * input_coords[i][1] - np.sin(delta) * input_coords[i][0]
-        ])
+        output_coords.append(
+            [
+                np.cos(delta) * input_coords[i][0] + np.sin(delta) * input_coords[i][1],
+                np.cos(delta) * input_coords[i][1] - np.sin(delta) * input_coords[i][0],
+            ]
+        )
 
     return output_coords
+
 
 def translate_coordinates(input_coords, dx, dy):
     """
@@ -81,12 +89,10 @@ def translate_coordinates(input_coords, dx, dy):
 
     for i in range(len(input_coords)):
 
-        output_coords.append([
-            input_coords[i][0] + dx,
-            input_coords[i][1] + dy
-        ])
+        output_coords.append([input_coords[i][0] + dx, input_coords[i][1] + dy])
 
     return output_coords
+
 
 def adapt_coordinates_to_canvas_frame(input_coords, canvas_width, canvas_height):
     """
@@ -106,10 +112,12 @@ def adapt_coordinates_to_canvas_frame(input_coords, canvas_width, canvas_height)
 
     for i in range(len(input_coords)):
 
-        output_coords.append([
-            input_coords[i][0] + canvas_width / 2,
-            -input_coords[i][1] + canvas_height / 2
-        ])
+        output_coords.append(
+            [
+                input_coords[i][0] + canvas_width / 2,
+                -input_coords[i][1] + canvas_height / 2,
+            ]
+        )
 
     return output_coords
 
@@ -140,22 +148,29 @@ def draw_orbit(
         canvas_height  canvas height
     """
 
-    app = App(int(canvas_width), int(canvas_height)) # create window: width, height
-    app.background(255, 255, 255) # set white background
-    app.stroke(0, 0, 0) # set stroke color to black
+    app = App(int(canvas_width), int(canvas_height))  # create window: width, height
+    app.background(255, 255, 255)  # set white background
+    app.stroke(0, 0, 0)  # set stroke color to black
 
-    positions_2d = planar_projection(positions, alpha, beta);
+    positions_2d = planar_projection(positions, alpha, beta)
 
-    positions_2d = rotate_coordinates(positions_2d, delta);
+    positions_2d = rotate_coordinates(positions_2d, delta)
 
-    positions_2d = translate_coordinates(positions_2d, x_translation, y_translation);
+    positions_2d = translate_coordinates(positions_2d, x_translation, y_translation)
 
-    positions_2d = adapt_coordinates_to_canvas_frame(positions_2d, canvas_width, canvas_height);
+    positions_2d = adapt_coordinates_to_canvas_frame(
+        positions_2d, canvas_width, canvas_height
+    )
 
     # drawing line
     for i in tqdm(range(len(positions_2d) - 1)):
-        app.line(positions_2d[i][0], positions_2d[i][1], positions_2d[i+1][0], positions_2d[i+1][1])
+        app.line(
+            positions_2d[i][0],
+            positions_2d[i][1],
+            positions_2d[i + 1][0],
+            positions_2d[i + 1][1],
+        )
 
-    app.redraw() # refresh drawing
+    app.redraw()  # refresh drawing
 
     app.exit()

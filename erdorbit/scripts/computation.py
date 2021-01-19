@@ -7,7 +7,7 @@ import numpy as np
 
 
 def compute_positions(
-    a, e, i, RAAN, om, MU_PLANET, ROT_PLANET, number_of_steps, step_time
+    a, e, inc, RAAN, om, MU_PLANET, ROT_PLANET, number_of_steps, step_time
 ):
     """
     This function computes the positions of the orbiting object in a ECEF reference frame
@@ -15,7 +15,7 @@ def compute_positions(
         - orbital parameters:
             a               semi-major axis
             e               eccentricity
-            i               inclination
+            inc             inclination
             RAAN            right ascension of the ascending node
             om              argument of periapsis
         - planetary constants:
@@ -37,7 +37,7 @@ def compute_positions(
         # computing this position vector for this step
         positions.append(
             from_orbital_to_cartesian_coordinates(
-                a, e, i, RAAN, om, time_elapsed, MU_PLANET
+                a, e, inc, RAAN, om, time_elapsed, MU_PLANET
             )
         )
 
