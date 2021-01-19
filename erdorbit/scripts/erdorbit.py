@@ -32,7 +32,9 @@ def erdorbit(config_file=None):
 
     # calculation parameters
     MU_PLANET = float(config["calculation"]["MU_PLANET"])
-    ROT_PLANET = float(config["calculation"]["ROT_PLANET"])
+    ROT_PLANET = (
+        float(config["calculation"]["ROT_PLANET"]) / 86164.1004
+    )  # translation from deg/sidereal-day to deg/s
     duration = (
         float(config["calculation"]["duration"]) * 86400
     )  # conversion from days to seconds
