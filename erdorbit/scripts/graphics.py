@@ -11,12 +11,14 @@ from tqdm import tqdm
 def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
     """
     This function resizes the drawing to fit the canvas size
-    - Input:
-        input_coords              input coordinates
-        canvas_height            canvas height
+    Input:
+        input_coords            [[float, float, float], ...]
+            x, y, z, position in km
+        canvas_height           float
         DRAWING_SIZE_FACTOR     float
-    - Output:
-        output_coords   output coordinates
+    Output:
+        output_coords           [[float, float, float], ...]
+            x, y, z, position in canvas dimension
     """
 
     # assuming size of object to draw is 2 times largest value in positions array
@@ -28,12 +30,16 @@ def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
 def planar_projection(input_array, alpha, beta):
     """
     Projecting an array of 3D coordinates on a plane
-    - Inputs:
-        input_array     array of 3D coordinates
-        alpha           rotation of the p.p. around intersection of itself and Oxy plane
-        beta            rotation of the projection plane around Oz
-    - Outputs:
-        outputArray     2D projection of the input array on the plane
+    Inputs:
+        input_array     [[float, float, float], ...]
+            3D position expressed as x, y, z
+        alpha           float
+            rotation of the projection plane around intersection of itself and Oxy plane (radians)
+        beta            float
+            rotation of the projection plane around Oz (radians)
+    Outputs:
+        output_array    [[float, float], ...]
+            2D projection of input positions expressed as x, y
     """
 
     output_array = []
@@ -52,13 +58,16 @@ def planar_projection(input_array, alpha, beta):
 
 def rotate_coordinates(input_coords, delta):
     """
-    This functions rotates 2D coordinates around the center of the reference frame from a delta angle
-    - Input:
-        input_coords  input 2D coordinates
-        delta       rotation angle
-            (rotation of the projected vector around the normal to the projection plane)
-    - Output:
-        output_coords output 2D coordinates
+    This functions rotates 2D coordinates around the center of the reference
+    frame from a 'delta' angle.
+    Input:
+        input_coords    [[float, float], ...]
+            2D coordinates expressed as x, y
+        delta           float
+            rotation of the projected vector around the normal to the projection plane, in radians
+    Output:
+        output_coords   [[float, float], ...]
+            2D coordinates expressed as x, y
     """
 
     output_coords = []
@@ -77,12 +86,16 @@ def rotate_coordinates(input_coords, delta):
 def translate_coordinates(input_coords, dx, dy):
     """
     This function translates the positions in a 2D reference frame
-    - Inputs:
-        input_coords    input coordinates
-        dx          translation along x axis
-        dy          translation along y axis
-    - Output:
-        output_coords     output coordinates
+    Inputs:
+        input_coords    [[float, float], ...]
+            2D coordinates expressed as x, y
+        dx              float
+            translation along x axis
+        dy              float
+            translation along y axis
+    Output:
+        output_coords   [[float, float, ], ...]
+            2D coordinates expressed as x, y
     """
 
     output_coords = []
@@ -100,12 +113,14 @@ def adapt_coordinates_to_canvas_frame(input_coords, canvas_width, canvas_height)
     pointing to the right, and the Y axis pointing down.
     This function transforms 2D coordinates so that the drawing is centered at the center of the
     canvas, with the Y axis pointing up.
-    - Input:
-        input_coords   array of 2D coordinates expressed in a "classical" cartesian reference frame
-        canvas_width  canvas width
-        canvas_height canvas height
-    - Output:
-        output_coords  array of 2D coordinates, adapted to the HTML5 canvas' reference frame
+    Input:
+        input_coords    [[float, float], ...]
+            array of 2D coordinates expressed in a "classical" cartesian reference frame
+        canvas_width    float
+        canvas_height   float
+    Output:
+        output_coords   [[float, float], ...]
+            array of 2D coordinates, adapted to the canvas' reference frame
     """
 
     output_coords = []
@@ -136,16 +151,21 @@ def draw_orbit(
     """
     This function draws the trajectory of an orbiting object on the canvas
     This function calls several previously defined functions
-    - Input:
-        pos   array of 3D cartesian positions the orbiting object
-        alpha         projection plane angle
-        beta          projection plane angle
-        delta         drawing rotation angle
-        xTranslation  drawing translation along x-axis
-        yTranslation  drawing translation along y-axis
-        canvasContext canvas context
-        canvas_width   canvas width
-        canvas_height  canvas height
+    Input:
+        pos             [[float, float, float], ...]
+            array of 3D cartesian positions the orbiting object
+        alpha           float
+            projection plane angle
+        beta            float
+            projection plane angle
+        delta           float
+            drawing rotation angle
+        x_translation   float
+            drawing translation along x-axis
+        y_translation   float
+            drawing translation along y-axis
+        canvas_width    float
+        canvas_height   float
     """
 
     app = App(int(canvas_width), int(canvas_height))  # create window: width, height

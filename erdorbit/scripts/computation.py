@@ -11,20 +11,20 @@ def compute_positions(
 ):
     """
     This function computes the positions of the orbiting object in a ECEF reference frame
-    - Inputs:
-        - orbital parameters:
-            a               semi-major axis
-            e               eccentricity
-            inc             inclination
-            RAAN            right ascension of the ascending node
-            om              argument of periapsis
-        - planetary constants:
-            MU_PLANET       planet gravitational parameter
-            ROT_PLANET      planet rotational velocity
-        number_of_steps     number of steps
-        step_time           step time
+    Inputs:
+        orbital parameters          [float, float, float, float, float]
+            a           semi-major axis (km)
+            e           eccentricity (unitless)
+            inc         inclination (deg)
+            RAAN        right ascension of the ascending node (deg)
+            om          argument of periapsis (deg)
+        planetary constants         [float, float]
+            MU_PLANET   planet gravitational parameter (km3/s2)
+            ROT_PLANET  planet rotational velocity (deg/s)
+        number_of_steps             int
+        step_time (s)               int
     Ouputs:
-        positions           [[float, float, float], ...]
+        positions (x, y, z, in km)  [[float, float, float], ...]
     """
 
     positions = []
@@ -49,12 +49,12 @@ def compute_positions(
 
 def rotate_frame_around_z(input_vector, angle):
     """
-        Converts coordinates to rotated reference frame.
+    Converts coordinates to rotated reference frame.
     Inputs:
-    -input_vector       [float, float, float]
-    -angle (degrees)    float
+        input_vector    [float, float, float]
+        angle (deg)     float
     Outputs:
-    -output_vector      [float, float, float]
+        output_vector   [float, float, float]
     """
 
     angle = angle * np.pi / 180
@@ -72,15 +72,15 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, raan, om, t, mu):
     """
     Converting from orbital parameters to cartesian coordinates.
     Input:
-        -a      float   semi-major axis (km)
-        -e      float   eccentricity (-)
-        -inc    float   inclination (deg)
-        -raan   float   right ascension of the ascending node (deg)
-        -om     float   argument of periapsis (deg)
-        -t      float   time spent since passage at periapsis (s)
-        -mu     float   gravitational parameter of the central body (km3/s2)
+        a       float                   semi-major axis (km)
+        e       float                   eccentricity (-)
+        inc     float                   inclination (deg)
+        raan    float                   right ascension of the ascending node (deg)
+        om      float                   argument of periapsis (deg)
+        t       float                   time spent since passage at periapsis (s)
+        mu      float                   gravitational parameter of the central body (km3/s2)
     Outputs:
-        -pos    [float, float, float] (km)
+        pos     [float, float, float]   x, y, z, in km
     """
 
     # converting angles from degrees to radians
