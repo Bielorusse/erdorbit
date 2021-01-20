@@ -22,7 +22,7 @@ def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
     """
 
     # assuming size of object to draw is 2 times largest value in positions array
-    drawing_size = np.max(np.asarray(positions)) * 2
+    drawing_size = np.max(np.abs(np.asarray(positions))) * 2
 
     return np.asarray(positions) * canvas_height / drawing_size * DRAWING_SIZE_FACTOR
 
@@ -109,7 +109,7 @@ def translate_coordinates(input_coords, dx, dy):
 
 def adapt_coordinates_to_canvas_frame(input_coords, canvas_width, canvas_height):
     """
-    The reference frame of the HTML5 canvas is centered in the upper left corner, with the X axis
+    The reference frame of the canvas is centered in the upper left corner, with the X axis
     pointing to the right, and the Y axis pointing down.
     This function transforms 2D coordinates so that the drawing is centered at the center of the
     canvas, with the Y axis pointing up.
@@ -192,5 +192,3 @@ def draw_orbit(
         )
 
     app.redraw()  # refresh drawing
-
-    app.exit()
