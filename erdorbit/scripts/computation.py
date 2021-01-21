@@ -44,7 +44,7 @@ def compute_positions(
         # rotating frame around z axis for conversion from J2000 to ECEF reference frame
         positions[-1] = rotate_frame_around_z(positions[-1], ROT_PLANET * time_elapsed)
 
-    return positions
+    return np.asarray(positions)
 
 
 def rotate_frame_around_z(input_vector, angle):
