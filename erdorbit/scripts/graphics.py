@@ -125,3 +125,15 @@ def get_projected_coords(
     positions_2d[:, 1] = -positions_2d[:, 1] + canvas_height / 2
 
     return positions_2d
+
+
+def write_csv_file(positions_2d, filename):
+    """
+    Write list of 2d positions in csv file.
+    Input:
+        -positions_2d   np array of floats shape (:, 2)
+        -filename       str
+    """
+    with open(filename, "w") as outfile:
+        for i in range(positions_2d.shape[0]):
+            outfile.write("{}, {}\n".format(positions_2d[i, 0], positions_2d[i, 1]))
