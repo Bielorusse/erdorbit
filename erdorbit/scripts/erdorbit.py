@@ -11,7 +11,8 @@ import configparser
 # local imports
 from computation import compute_positions
 from graphics import resize_drawing_to_fit_canvas
-from graphics import draw_orbit
+from graphics import get_projected_coords
+from drawing import draw_orbit
 
 
 def erdorbit(config_file=None):
@@ -72,8 +73,8 @@ def erdorbit(config_file=None):
         positions, canvas_height, DRAWING_SIZE_FACTOR
     )
 
-    # drawing orbit
-    draw_orbit(
+    # get 2d projected coords
+    positions_2d = get_projected_coords(
         positions,
         alpha,
         beta,
@@ -83,6 +84,9 @@ def erdorbit(config_file=None):
         canvas_width,
         canvas_height,
     )
+
+    # drawing orbit
+    draw_orbit(positions_2d, canvas_width, canvas_height)
 
 
 if __name__ == "__main__":

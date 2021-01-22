@@ -4,8 +4,6 @@ Graphics module for erdorbit.
 
 # third party imports
 import numpy as np
-from processing_py import *
-from tqdm import tqdm
 
 
 def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
@@ -82,7 +80,7 @@ def rotate_coordinates(input_coords, delta):
     return output_coords
 
 
-def draw_orbit(
+def get_projected_coords(
     positions,
     alpha,
     beta,
@@ -93,8 +91,7 @@ def draw_orbit(
     canvas_height,
 ):
     """
-    This function draws the trajectory of an orbiting object on the canvas
-    This function calls several previously defined functions
+    Converts the 3D positions of the orbit to projected 2D positions intended for drawing.
     Input:
         pos             np array of floats shape (:, 3)
             array of 3D cartesian positions the orbiting object
@@ -110,11 +107,10 @@ def draw_orbit(
             drawing translation along y-axis
         canvas_width    float
         canvas_height   float
+    Output:
+        positions_2d    np array of floats shape (:, 2)
+            array of 2D computer positions the orbiting object
     """
-
-    app = App(int(canvas_width), int(canvas_height))  # create window: width, height
-    app.background(255, 255, 255)  # set white background
-    app.stroke(0, 0, 0)  # set stroke color to black
 
     positions_2d = planar_projection(positions, alpha, beta)
 
@@ -128,13 +124,4 @@ def draw_orbit(
     positions_2d[:, 0] += canvas_width / 2
     positions_2d[:, 1] = -positions_2d[:, 1] + canvas_height / 2
 
-    # drawing line
-    for i in tqdm(range(len(positions_2d) - 1)):
-        app.line(
-            positions_2d[i][0],
-            positions_2d[i][1],
-            positions_2d[i + 1][0],
-            positions_2d[i + 1][1],
-        )
-
-    app.redraw()  # refresh drawing
+    return positions_2d
