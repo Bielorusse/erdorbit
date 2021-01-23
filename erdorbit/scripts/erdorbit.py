@@ -8,6 +8,11 @@ import sys
 import argparse
 import configparser
 
+# third party imports
+from processing_py import *
+from tqdm import tqdm
+import numpy as np
+
 # local imports
 from computation import compute_positions
 from graphics import resize_drawing_to_fit_canvas
@@ -75,23 +80,42 @@ def erdorbit(config_file=None):
         positions, canvas_height, DRAWING_SIZE_FACTOR
     )
 
-    # get 2d projected coords
-    positions_2d = get_projected_coords(
-        positions,
-        alpha,
-        beta,
-        delta,
-        x_translation,
-        y_translation,
-        canvas_width,
-        canvas_height,
-    )
+    # creating some constants for drawing with processing
+    app = App(int(canvas_width), int(canvas_height))  # create window: width, height
+    app.stroke(0, 0, 0)  # set stroke color to black
+
+    while(True):
+
+        app.background(255, 255, 255)  # set white background
+
+        alpha = app.mouseX / canvas_width * 2 * np.pi
+        beta = app.mouseY / canvas_height * 2 * np.pi
+
+        # get 2d projected coords
+        positions_2d = get_projected_coords(
+            positions,
+            alpha,
+            beta,
+            delta,
+            x_translation,
+            y_translation,
+            canvas_width,
+            canvas_height,
+        )
+
+        # drawing line
+        for i in range(len(positions_2d) - 1):
+            app.line(
+                positions_2d[i][0],
+                positions_2d[i][1],
+                positions_2d[i + 1][0],
+                positions_2d[i + 1][1],
+            )
+
+        app.redraw()  # refresh drawing
 
     if csv_output_file != "None":
         write_csv_file(positions_2d, csv_output_file)
-
-    # drawing orbit
-    draw_orbit(positions_2d, canvas_width, canvas_height)
 
 
 if __name__ == "__main__":
