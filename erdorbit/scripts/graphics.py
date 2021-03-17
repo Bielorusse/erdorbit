@@ -4,6 +4,7 @@ Graphics module for erdorbit.
 
 # third party imports
 import numpy as np
+from shapely.geometry import LineString
 
 
 def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
@@ -137,3 +138,41 @@ def write_csv_file(positions_2d, filename):
     with open(filename, "w") as outfile:
         for i in range(positions_2d.shape[0]):
             outfile.write("{}, {}\n".format(positions_2d[i, 0], positions_2d[i, 1]))
+
+
+def write_svg_file(
+    positions_2d, filename, canvas_width, canvas_height, title=None, description=None
+):
+    """
+    Write list of 2d positions in svg file as lines.
+    Input:
+        -positions_2d   np array of floats shape (:, 2)
+        -filename       str
+        -canvas_width   int
+        -canvas_height  int
+        -title          str
+        -description    str
+    """
+    with open(filename, "w") as outfile:
+
+        # write headers
+        outfile.write("<?xml version='1.0' encoding='utf-8'?>\n")
+        outfile.write(
+            "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='{}' height='{}'>\n".format(
+                canvas_width, canvas_height
+            )
+        )
+        if title:
+            outfile.write("<title>{}</title>\n".format(title))
+        if description:
+            outfile.write("<description>{}</description>\n".format(description))
+
+        # loop through 2d positions
+        for i in range(positions_2d.shape[0] - 1):
+
+            # create linestring
+            line = LineString([positions_2d[i, :], positions_2d[i + 1, :]])
+            outfile.write("{}\n".format(line.svg()))
+
+        # write footer
+        outfile.write("</svg>")

@@ -13,6 +13,7 @@ from computation import compute_positions
 from graphics import resize_drawing_to_fit_canvas
 from graphics import get_projected_coords
 from graphics import write_csv_file
+from graphics import write_svg_file
 from drawing import draw_orbit
 
 
@@ -64,6 +65,7 @@ def erdorbit(config_file=None):
     canvas_width = float(config["drawing"]["canvas_width"])
     DRAWING_SIZE_FACTOR = float(config["drawing"]["DRAWING_SIZE_FACTOR"])
     csv_output_file = config["drawing"]["csv_output_file"]
+    svg_output_file = config["drawing"]["svg_output_file"]
 
     # computing positions
     positions = compute_positions(
@@ -89,6 +91,9 @@ def erdorbit(config_file=None):
 
     if csv_output_file != "None":
         write_csv_file(positions_2d, csv_output_file)
+
+    if svg_output_file != "None":
+        write_svg_file(positions_2d, svg_output_file, canvas_width, canvas_height)
 
     # drawing orbit
     draw_orbit(positions_2d, canvas_width, canvas_height)
