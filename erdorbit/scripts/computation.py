@@ -115,15 +115,15 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, raan, om, t, mu):
         (
             r
             * (
+                np.cos(om + nu) * np.cos(raan)
+                - np.sin(om + nu) * np.sin(raan) * np.cos(inc)
+            ),
+            r
+            * (
                 np.cos(om + nu) * np.sin(raan)
                 + np.sin(om + nu) * np.cos(raan) * np.cos(inc)
             ),
             r * (np.sin(om + nu) * np.sin(inc)),
-            r
-            * (
-                np.cos(om + nu) * np.cos(raan)
-                - np.sin(om + nu) * np.sin(raan) * np.cos(inc)
-            ),
         )
     )
 
