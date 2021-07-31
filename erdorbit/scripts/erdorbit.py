@@ -66,6 +66,7 @@ def erdorbit(config_file=None):
     DRAWING_SIZE_FACTOR = float(config["drawing"]["DRAWING_SIZE_FACTOR"])
     csv_output_file = config["drawing"]["csv_output_file"]
     svg_output_file = config["drawing"]["svg_output_file"]
+    display_p5_preview = config["drawing"]["display_p5_preview"]
 
     # computing positions
     positions = compute_positions(
@@ -95,8 +96,8 @@ def erdorbit(config_file=None):
     if svg_output_file != "None":
         write_svg_file(positions_2d, svg_output_file, canvas_width, canvas_height)
 
-    # drawing orbit
-    draw_orbit(positions_2d, canvas_width, canvas_height)
+    if display_p5_preview.lower() in ["true", "t", "y", "yes"]:
+        draw_orbit(positions_2d, canvas_width, canvas_height)
 
 
 if __name__ == "__main__":
