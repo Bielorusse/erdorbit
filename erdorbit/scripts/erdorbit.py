@@ -8,6 +8,9 @@ import sys
 import argparse
 import configparser
 
+# third party imports
+import numpy as np
+
 # local imports
 from computation import compute_positions
 from graphics import resize_drawing_to_fit_canvas
@@ -56,9 +59,9 @@ def erdorbit(config_file=None):
     om = float(config["calculation"]["om"])
 
     # drawing parameters
-    alpha = float(config["drawing"]["alpha"])
-    beta = float(config["drawing"]["beta"])
-    delta = float(config["drawing"]["delta"])
+    alpha = float(config["drawing"]["alpha"]) * np.pi / 180
+    beta = float(config["drawing"]["beta"]) * np.pi / 180
+    delta = float(config["drawing"]["delta"]) * np.pi / 180
     x_translation = float(config["drawing"]["x_translation"])
     y_translation = float(config["drawing"]["y_translation"])
     canvas_height = float(config["drawing"]["canvas_height"])
