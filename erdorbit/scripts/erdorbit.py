@@ -15,6 +15,7 @@ import numpy as np
 from computation import compute_positions
 from graphics import resize_drawing_to_fit_canvas
 from graphics import get_projected_coords
+from graphics import from_cartesian_to_computer_coords
 from graphics import write_csv_file
 from graphics import write_svg_file
 from drawing import draw_orbit
@@ -91,6 +92,11 @@ def erdorbit(config_file=None):
         y_translation,
         canvas_width,
         canvas_height,
+    )
+
+    # coordinates conversion from cartesian to computer
+    positions_2d = from_cartesian_to_computer_coords(
+        positions_2d, canvas_width, canvas_height
     )
 
     if csv_output_file != "None":

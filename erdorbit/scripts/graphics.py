@@ -7,23 +7,23 @@ import numpy as np
 from shapely.geometry import LineString
 
 
-def resize_drawing_to_fit_canvas(positions, canvas_height, DRAWING_SIZE_FACTOR):
+def resize_drawing_to_fit_canvas(input_coords, canvas_height, drawing_size_factor):
     """
     This function resizes the drawing to fit the canvas size
     Input:
         input_coords            np array of floats shape (:, 3)
             x, y, z, position in km
         canvas_height           float
-        DRAWING_SIZE_FACTOR     float
+        drawing_size_factor     float
     Output:
-        output_coords           np array of floats shape (:, 3)
+        np array of floats shape (:, 3)
             x, y, z, position in canvas dimension
     """
 
     # assuming size of object to draw is 2 times largest value in positions array
-    drawing_size = np.max(np.abs(positions)) * 2
+    drawing_size = np.max(np.abs(input_coords)) * 2
 
-    return positions * canvas_height / drawing_size * DRAWING_SIZE_FACTOR
+    return input_coords * canvas_height / drawing_size * drawing_size_factor
 
 
 def planar_projection(input_array, alpha, beta):
@@ -95,7 +95,7 @@ def get_projected_coords(
     Converts the 3D positions of the orbit to projected 2D positions intended for drawing.
     Input:
         pos             np array of floats shape (:, 3)
-            array of 3D cartesian positions the orbiting object
+            array of 3D cartesian positions of the orbiting object
         alpha           float
             projection plane angle
         beta            float
@@ -110,7 +110,7 @@ def get_projected_coords(
         canvas_height   float
     Output:
         positions_2d    np array of floats shape (:, 2)
-            array of 2D computer positions the orbiting object
+            array of 2D cartesian positions of the orbiting object
     """
 
     positions_2d = planar_projection(positions, alpha, beta)
@@ -120,6 +120,22 @@ def get_projected_coords(
     # translate coordinates
     positions_2d[:, 0] += x_translation
     positions_2d[:, 1] += y_translation
+
+    return positions_2d
+
+
+def from_cartesian_to_computer_coords(positions_2d, canvas_width, canvas_height):
+    """
+    Conversion from cartesian to computer coordinates.
+    Input:
+        positions_2d    np array of floats shape (:, 2)
+            array of 2D cartesian positions of the orbiting object
+        canvas_width    float
+        canvas_height   float
+    Output:
+        positions_2d    np array of floats shape (:, 2)
+            array of 2D computer positions of the orbiting object
+    """
 
     # conversion from cartesian to computer coordinates.
     positions_2d[:, 0] += canvas_width / 2
@@ -141,7 +157,12 @@ def write_csv_file(positions_2d, filename):
 
 
 def write_svg_file(
-    positions_2d, filename, canvas_width, canvas_height, title=None, description=None
+    positions_2d,
+    filename,
+    canvas_width,
+    canvas_height,
+    title=None,
+    description=None,
 ):
     """
     Write list of 2d positions in svg file as lines.
