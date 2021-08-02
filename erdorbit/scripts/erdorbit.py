@@ -13,7 +13,7 @@ import numpy as np
 
 # local imports
 from computation import compute_positions
-from graphics import resize_drawing_to_fit_canvas
+from graphics import resize_2d_drawing_to_fit_canvas
 from graphics import get_projected_coords
 from graphics import from_cartesian_to_computer_coords
 from graphics import write_csv_file
@@ -77,11 +77,6 @@ def erdorbit(config_file=None):
         a, e, inc, RAAN, om, MU_PLANET, ROT_PLANET, number_of_steps, step_time
     )
 
-    # resizing to canvas
-    positions = resize_drawing_to_fit_canvas(
-        positions, canvas_height, DRAWING_SIZE_FACTOR
-    )
-
     # get 2d projected coords
     positions_2d = get_projected_coords(
         positions,
@@ -97,6 +92,11 @@ def erdorbit(config_file=None):
     # coordinates conversion from cartesian to computer
     positions_2d = from_cartesian_to_computer_coords(
         positions_2d, canvas_width, canvas_height
+    )
+
+    # resizing to canvas
+    positions_2d = resize_2d_drawing_to_fit_canvas(
+        positions_2d, canvas_width, canvas_height, DRAWING_SIZE_FACTOR
     )
 
     if csv_output_file != "None":
