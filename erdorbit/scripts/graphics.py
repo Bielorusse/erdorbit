@@ -42,13 +42,6 @@ def resize_2d_drawing_to_fit_canvas(
             x, y position in canvas dimension
     """
 
-    def translate(value, input_min, input_max, output_min, output_max):
-        """Translate values from one interval to another"""
-        input_span = input_max - input_min
-        output_span = output_max - output_min
-        value_scaled = (value - input_min) / input_span
-        return output_min + (value_scaled * output_span)
-
     # find out if portrait or landscape mode
     portrait_mode = False
     if canvas_height >= canvas_width:
@@ -66,21 +59,44 @@ def resize_2d_drawing_to_fit_canvas(
     else:
         output_coords = input_coords
 
-    # scale drawing
-    output_coords[:, 0] = translate(
-        output_coords[:, 0],
-        np.min(output_coords[:, 0]),
-        np.max(output_coords[:, 0]),
-        canvas_width * (1 - drawing_size_factor),
-        canvas_width * drawing_size_factor,
-    )
-    output_coords[:, 1] = translate(
-        output_coords[:, 1],
-        np.min(output_coords[:, 1]),
-        np.max(output_coords[:, 1]),
-        canvas_height * (1 - drawing_size_factor),
-        canvas_height * drawing_size_factor,
-    )
+    # find out along which dimension to scale drawing to constrain proportions
+    x_scaling = (
+        canvas_width * drawing_size_factor - (canvas_width * (1 - drawing_size_factor))
+    ) / (np.max(output_coords[:, 0]) - np.min(output_coords[:, 0]))
+    y_scaling = (
+        canvas_height * drawing_size_factor
+        - (canvas_height * (1 - drawing_size_factor))
+    ) / (np.max(output_coords[:, 1]) - np.min(output_coords[:, 1]))
+    if x_scaling < y_scaling:  # scale drawing by x dimension and contrain proportions
+        scaling_factor = x_scaling
+        # along x: apply standard translation
+        output_coords[:, 0] = (
+            canvas_width * (1 - drawing_size_factor)
+            + (output_coords[:, 0] - np.min(output_coords[:, 0])) * scaling_factor
+        )
+        # along y: use x scaling factor and replace to center
+        output_coords[:, 1] = (
+            canvas_height / 2
+            - (np.max(output_coords[:, 1]) - np.min(output_coords[:, 1]))
+            / 2
+            * scaling_factor
+            + (output_coords[:, 1] - np.min(output_coords[:, 1])) * scaling_factor
+        )
+    else:  # scale drawing by y dimension and contrain proportions
+        scaling_factor = y_scaling
+        # along y: apply standard translation
+        output_coords[:, 1] = (
+            canvas_height * (1 - drawing_size_factor)
+            + (output_coords[:, 1] - np.min(output_coords[:, 1])) * scaling_factor
+        )
+        # along x: use y scaling factor and replace to center
+        output_coords[:, 0] = (
+            canvas_width / 2
+            - (np.max(output_coords[:, 0]) - np.min(output_coords[:, 0]))
+            / 2
+            * scaling_factor
+            + (output_coords[:, 0] - np.min(output_coords[:, 0])) * scaling_factor
+        )
 
     return output_coords
 
