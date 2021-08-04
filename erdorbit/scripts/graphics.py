@@ -7,14 +7,15 @@ import numpy as np
 from shapely.geometry import LineString
 
 
-def resize_3d_drawing_to_fit_canvas(input_coords, canvas_height, drawing_size_factor):
+def resize_3d_drawing_to_fit_canvas(input_coords, canvas_height, margins):
     """
     This function resizes the drawing to fit the canvas size
     Input:
         input_coords            np array of floats shape (:, 3)
             x, y, z, position in km
         canvas_height           float
-        drawing_size_factor     float
+        margins                 (int, int, int, int)
+            left, top, right, bottom canvas margins
     Output:
         np array of floats shape (:, 3)
             x, y, z, position in canvas dimension
@@ -23,12 +24,10 @@ def resize_3d_drawing_to_fit_canvas(input_coords, canvas_height, drawing_size_fa
     # assuming size of object to draw is 2 times largest value in positions array
     drawing_size = np.max(np.abs(input_coords)) * 2
 
-    return input_coords * canvas_height / drawing_size * drawing_size_factor
+    return input_coords * (canvas_height - margins[1] - margins[3]) / drawing_size
 
 
-def resize_2d_drawing_to_fit_canvas(
-    input_coords, canvas_width, canvas_height, drawing_size_factor
-):
+def resize_2d_drawing_to_fit_canvas(input_coords, canvas_width, canvas_height, margins):
     """
     This function resizes the drawing to fit the canvas size
     Input:
@@ -36,7 +35,8 @@ def resize_2d_drawing_to_fit_canvas(
             x, y position in km
         canvas_width            float
         canvas_height           float
-        drawing_size_factor     float
+        margins                 (int, int, int, int)
+            left, top, right, bottom canvas margins
     Output:
         np array of floats shape (:, 2)
             x, y position in canvas dimension
@@ -60,18 +60,17 @@ def resize_2d_drawing_to_fit_canvas(
         output_coords = input_coords
 
     # find out along which dimension to scale drawing to constrain proportions
-    x_scaling = (
-        canvas_width * drawing_size_factor - (canvas_width * (1 - drawing_size_factor))
-    ) / (np.max(output_coords[:, 0]) - np.min(output_coords[:, 0]))
-    y_scaling = (
-        canvas_height * drawing_size_factor
-        - (canvas_height * (1 - drawing_size_factor))
-    ) / (np.max(output_coords[:, 1]) - np.min(output_coords[:, 1]))
+    x_scaling = (canvas_width - margins[2] - margins[0]) / (
+        np.max(output_coords[:, 0]) - np.min(output_coords[:, 0])
+    )
+    y_scaling = (canvas_height - margins[1] - margins[3]) / (
+        np.max(output_coords[:, 1]) - np.min(output_coords[:, 1])
+    )
     if x_scaling < y_scaling:  # scale drawing by x dimension and contrain proportions
         scaling_factor = x_scaling
         # along x: apply standard translation
         output_coords[:, 0] = (
-            canvas_width * (1 - drawing_size_factor)
+            margins[0]
             + (output_coords[:, 0] - np.min(output_coords[:, 0])) * scaling_factor
         )
         # along y: use x scaling factor and replace to center
@@ -86,7 +85,7 @@ def resize_2d_drawing_to_fit_canvas(
         scaling_factor = y_scaling
         # along y: apply standard translation
         output_coords[:, 1] = (
-            canvas_height * (1 - drawing_size_factor)
+            margins[1]
             + (output_coords[:, 1] - np.min(output_coords[:, 1])) * scaling_factor
         )
         # along x: use y scaling factor and replace to center

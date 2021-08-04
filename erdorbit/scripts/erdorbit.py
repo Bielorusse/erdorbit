@@ -67,7 +67,7 @@ def erdorbit(config_file=None):
     y_translation = float(config["drawing"]["y_translation"])
     canvas_height = float(config["drawing"]["canvas_height"])
     canvas_width = float(config["drawing"]["canvas_width"])
-    DRAWING_SIZE_FACTOR = float(config["drawing"]["DRAWING_SIZE_FACTOR"])
+    margins = [int(v.strip()) for v in config["drawing"]["margins"].split(",")]
     csv_output_file = config["drawing"]["csv_output_file"]
     svg_output_file = config["drawing"]["svg_output_file"]
     display_p5_preview = config["drawing"]["display_p5_preview"]
@@ -96,7 +96,7 @@ def erdorbit(config_file=None):
 
     # resizing to canvas
     positions_2d = resize_2d_drawing_to_fit_canvas(
-        positions_2d, canvas_width, canvas_height, DRAWING_SIZE_FACTOR
+        positions_2d, canvas_width, canvas_height, margins
     )
 
     if csv_output_file != "None":
