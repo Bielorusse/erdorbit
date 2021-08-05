@@ -75,11 +75,12 @@ def resize_2d_drawing_to_fit_canvas(input_coords, canvas_width, canvas_height, m
         )
         # along y: use x scaling factor and replace to center
         output_coords[:, 1] = (
-            canvas_height / 2
+            (output_coords[:, 1] - np.min(output_coords[:, 1])) * scaling_factor
+            + margins[1]
             - (np.max(output_coords[:, 1]) - np.min(output_coords[:, 1]))
-            / 2
             * scaling_factor
-            + (output_coords[:, 1] - np.min(output_coords[:, 1])) * scaling_factor
+            / 2
+            + (canvas_height - margins[1] - margins[3]) / 2
         )
     else:  # scale drawing by y dimension and contrain proportions
         scaling_factor = y_scaling
@@ -90,13 +91,13 @@ def resize_2d_drawing_to_fit_canvas(input_coords, canvas_width, canvas_height, m
         )
         # along x: use y scaling factor and replace to center
         output_coords[:, 0] = (
-            canvas_width / 2
+            (output_coords[:, 0] - np.min(output_coords[:, 0])) * scaling_factor
+            + margins[0]
             - (np.max(output_coords[:, 0]) - np.min(output_coords[:, 0]))
-            / 2
             * scaling_factor
-            + (output_coords[:, 0] - np.min(output_coords[:, 0])) * scaling_factor
+            / 2
+            + (canvas_width - margins[0] - margins[2]) / 2
         )
-
     return output_coords
 
 
