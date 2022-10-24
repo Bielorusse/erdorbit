@@ -1,0 +1,10 @@
+name: erdorbit
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - tqdm
+  - shapely
+  - pip
+  - pip:
+    - processing-py
