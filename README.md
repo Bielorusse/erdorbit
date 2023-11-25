@@ -1,11 +1,8 @@
-Erdorbit V1.1.1 <br>
-Date 20200104 <br>
-Author: Thibaut Voirand <br>
+# Erdorbit
 
-See erdorbit.com <br>
-Plotting orbits in an ECEF frame (Earth centered, Earth fixed) <br>
-Inspiration: Quadrature - orbits <br>
+Plot the trajectory of an object flying on a specific orbit around the earth, as seen in an Earth-centered, Earth-fixed frame (ECEF).
+Try it on [erdorbit.com](https://www.erdorbit.com).
 
-Added in this version: <br>
+This project was inspired by the audiovisual performance [Orbits](https://quadrature.co/work/orbits/) by Quadrature.
 
-  - adapted website to https
+<img src="docs/example.png" width="50%"/>
